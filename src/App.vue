@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
+import DarkSwitcher from './components/atoms/DarkSwitcher.vue'
 </script>
 
 <template>
