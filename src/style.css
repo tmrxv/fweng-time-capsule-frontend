@@ -1,0 +1,25 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-dark: #0b132b;
+  --color-dark-blue: #1c2541;
+  --color-medium-dark-blue: #3a506b;
+  --color-lighter-blue: #5bc0be;
+  --color-lightest-blue: #6fffe9;
+}
+
+/* Base font */
+@layer base {
+  html,
+  body {
+    font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  }
+}
+
+/* Optional smooth transition for theme */
+html {
+  background-color: dark;
+  transition:
+    background-color 0.5s ease,
+    color 0.5s ease;
+}
