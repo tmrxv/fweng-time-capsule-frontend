@@ -1,6 +1,5 @@
 <script setup>
 import { computed } from 'vue'
-import InputField from '@/components/atoms/InputField.vue'
 
 const props = defineProps({
   id: {
@@ -12,20 +11,16 @@ const props = defineProps({
     required: true,
   },
   modelValue: {
-    type: [String, Number],
+    type: String,
     default: '',
   },
   placeholder: {
     type: String,
     default: '',
   },
-  type: {
-    type: String,
-    default: 'text', // text | email | password...
-  },
-  size: {
-    type: String,
-    default: 'md', // sm | md | lg
+  rows: {
+    type: Number,
+    default: 4,
   },
   disabled: {
     type: Boolean,
@@ -37,13 +32,12 @@ const emit = defineEmits(['update:modelValue'])
 
 const innerValue = computed({
   get: () => props.modelValue,
-  set: (v) => emit('update:modelValue', v),
+  set: (val) => emit('update:modelValue', val),
 })
 </script>
 
 <template>
   <div class="flex flex-col gap-1">
-    <!-- Label -->
     <label
       v-if="label"
       :for="id"
@@ -52,16 +46,13 @@ const innerValue = computed({
       {{ label }}
     </label>
 
-    <!-- Input Atom -->
-    <InputField
+    <textarea
+      :id="id"
       v-model="innerValue"
+      :rows="rows"
       :placeholder="placeholder"
-      :type="type"
-      :size="size"
       :disabled="disabled"
-      v-bind="{ id }"
+      class="rounded-lg border bg-dark-blue text-lightest-blue border-medium-dark-blue placeholder-lighter-blue focus:outline-none focus:ring-2 focus:ring-lighter-blue disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 text-sm resize-y"
     />
   </div>
 </template>
-
-

@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue'
-import InputField from '@/components/atoms/InputField.vue'
+import Dropdown from '@/components/atoms/Dropdown.vue'
 
 const props = defineProps({
   id: {
@@ -15,13 +15,13 @@ const props = defineProps({
     type: [String, Number],
     default: '',
   },
+  options: {
+    type: Array,
+    required: true,
+  },
   placeholder: {
     type: String,
-    default: '',
-  },
-  type: {
-    type: String,
-    default: 'text', // text | email | password...
+    default: 'Select an option',
   },
   size: {
     type: String,
@@ -31,19 +31,26 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  error: {
+    type: String,
+    default: '',
+  },
+  helperText: {
+    type: String,
+    default: '',
+  },
 })
 
 const emit = defineEmits(['update:modelValue'])
 
 const innerValue = computed({
   get: () => props.modelValue,
-  set: (v) => emit('update:modelValue', v),
+  set: (val) => emit('update:modelValue', val),
 })
 </script>
 
 <template>
   <div class="flex flex-col gap-1">
-    <!-- Label -->
     <label
       v-if="label"
       :for="id"
@@ -52,16 +59,19 @@ const innerValue = computed({
       {{ label }}
     </label>
 
-    <!-- Input Atom -->
-    <InputField
+    <Dropdown
       v-model="innerValue"
+      :options="options"
       :placeholder="placeholder"
-      :type="type"
       :size="size"
       :disabled="disabled"
-      v-bind="{ id }"
     />
+
+    <p v-if="error" class="text-xs text-red-400">
+      {{ error }}
+    </p>
+    <p v-else-if="helperText" class="text-xs text-lightest-blue/60">
+      {{ helperText }}
+    </p>
   </div>
 </template>
-
-
