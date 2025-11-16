@@ -1,3 +1,6 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+</script>
 
-<template>About View</template>
+<template>
+  Yes, this is the About View.
+</template>

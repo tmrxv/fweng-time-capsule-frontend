@@ -1,7 +1,7 @@
-<script setup>
+<script setup lang="ts">
 import Button from '@/components/atoms/Button.vue'
 
-const props = defineProps({
+defineProps({
   primaryLabel: {
     type: String,
     default: 'Save',
