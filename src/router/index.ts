@@ -35,6 +35,16 @@ const router = createRouter({
       name: 'sign-up',
       component: () => import('../pages/SignUpView.vue'),
     },
+        {
+      path: '/capsules',
+      name: 'capsules',
+      component: () => import('../pages/CapsulesView.vue'),
+    },
+    {
+      path: '/explore',
+      name: 'explore',
+      component: () => import('../pages/CapsulesView.vue'),
+    }
   ],
 })
 

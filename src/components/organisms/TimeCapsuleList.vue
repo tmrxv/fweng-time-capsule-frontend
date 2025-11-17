@@ -1,34 +1,51 @@
 <script setup lang="ts">
 import TimeCapsuleCard from '@/components/molecules/TimeCapsuleCard.vue'
-import NotificationBanner from '@/components/molecules/NotificationBanner.vue'
 
-const props = defineProps({
-  capsules: {
-    type: Array as () => Array<Record<string, unknown>>,
-    default: () => [],
-  },
-})
+export interface Capsule {
+  id: number
+  title: string
+  preview?: string
+  message?: string
+  deliveryDate: string
+  visibility: 'PUBLIC' | 'PRIVATE'
+  createdAt?: string
+  hasAttachment?: boolean
+}
 
-const emit = defineEmits(['select'])
+const props = defineProps<{
+  capsules: Capsule[]
+}>()
+
+const emit = defineEmits<{
+  (e: 'select', capsule: Capsule): void
+}>()
+
+function handleClick(capsule: Capsule) {
+  emit('select', capsule)
+}
 </script>
 
 <template>
-  <section>
+  <section class="bg-black-100 p-6 rounded-xl shadow-inner">
     <template v-if="capsules.length">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <TimeCapsuleCard
           v-for="cap in capsules"
-          :key="cap.id || cap.title"
+          :key="cap.id"
           :title="cap.title"
           :previewText="cap.preview || cap.message"
           :deliveryDate="cap.deliveryDate"
           :visibility="cap.visibility"
-          @click="() => emit('select', cap)"
+          :createdAt="cap.createdAt"
+          :hasAttachment="cap.hasAttachment"
+          @click="handleClick(cap)"
         />
       </div>
     </template>
     <template v-else>
-      <NotificationBanner type="info" message="No time capsules found." />
+      <p class="text-gray-500 text-center py-10">
+        No time capsules found.
+      </p>
     </template>
   </section>
 </template>
