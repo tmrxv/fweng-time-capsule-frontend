@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
+import ErrorModal from './components/organisms/ErrorModal.vue'
 </script>
 
 <template>
@@ -15,6 +16,7 @@ import { RouterLink, RouterView } from 'vue-router'
     <RouterView />
   </main>
   <footer></footer>
+  <ErrorModal />
 </template>
 
 <style scoped></style>
