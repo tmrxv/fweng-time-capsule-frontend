@@ -44,6 +44,16 @@ const router = createRouter({
       path: '/explore',
       name: 'explore',
       component: () => import('../pages/CapsulesView.vue'),
+    },
+    {
+      path: '/help',
+      name: 'help',
+      component: () => import('../pages/HelpView.vue'),
+    },
+    {
+      path: '/imprint',
+      name: 'imprint',
+      component: () => import('../pages/ImprintView.vue'),
     }
   ],
 })

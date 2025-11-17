@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import DashboardStats from '@/components/organisms/DashboardStats.vue'
-import TimeCapsuleCard from '@/components/molecules/TimeCapsuleCard.vue'
+import TimeCapsuleList from '@/components/organisms/TimeCapsuleList.vue'
 import FormActions from '@/components/molecules/FormActions.vue'
+import Button from '@/components/atoms/Button.vue'
 
 type Capsule = {
   id?: string | number
@@ -32,25 +33,15 @@ const emit = defineEmits(['create', 'view'])
 
     <div>
       <div class="flex items-center justify-between mb-3">
-        <h3 class="text-lg font-semibold">Your Time Capsules</h3>
-        <FormActions primaryLabel="Create" @primary="() => emit('create')" />
+        <h3 class="text-lg font-semibold">Time Capsules</h3>
+        <Button primaryLabel="Create" @primary="() => emit('create')" />
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <template v-if="capsules.length">
-          <TimeCapsuleCard
-            v-for="cap in capsules"
-            :key="cap.id || cap.title"
-            :title="cap.title"
-            :previewText="cap.preview || cap.message"
-            :deliveryDate="cap.deliveryDate"
-            :visibility="cap.visibility"
-            @click="emit('view', cap)"
+          <TimeCapsuleList
+            :capsules="capsules"
+            @select="handleSelect"
           />
-        </template>
-        <template v-else>
-          <p class="text-sm text-muted col-span-full">No time capsules yet.</p>
-        </template>
       </div>
     </div>
   </section>

@@ -2,7 +2,7 @@
 
 <template>
   <section class="space-y-6 p-6 bg-dark-blue min-h-screen text-lightest-blue">
-    <h1 class="text-3xl font-extrabold">Imprint</h1>
+    <h1 class="text-3xl font-extrabold text-white">Imprint</h1>
 
     <div class="space-y-4">
 

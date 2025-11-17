@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
 import ErrorModal from './components/organisms/ErrorModal.vue'
+import HeaderNav from './components/organisms/HeaderNav.vue';
 </script>
 
 <template>
   <header>
     <nav>
       <div>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
+        <HeaderNav />
       </div>
     </nav>
   </header>

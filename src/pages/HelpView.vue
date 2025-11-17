@@ -2,13 +2,13 @@
 
 <template>
   <section class="space-y-6 p-6 bg-dark-blue min-h-screen text-lightest-blue">
-    <h1 class="text-3xl font-extrabold">Help &amp; Support</h1>
+    <h1 class="text-3xl font-extrabold text-white">Help &amp; Support</h1>
 
     <div class="space-y-4">
       <div class="bg-medium-dark-blue p-6 rounded-lg border border-dark">
         <h2 class="text-xl font-bold mb-2">How do I create an account?</h2>
         <p class="text-lightest-blue/80">
-          Click on the "Register" button and enter your email, username, password and country. 
+          Click on the "Register" button and enter your email, username, password and country.
           After submitting the form you can log in with your new credentials.
         </p>
       </div>
@@ -16,7 +16,7 @@
       <div class="bg-medium-dark-blue p-6 rounded-lg border border-dark">
         <h2 class="text-xl font-bold mb-2">How do I create a time capsule?</h2>
         <p class="text-lightest-blue/80">
-          On the Home page, add a title and message, choose a delivery date and time and set 
+          On the Home page, add a title and message, choose a delivery date and time and set
           the visibility (public or private). Optionally upload a file and then save the capsule.
         </p>
       </div>
@@ -32,7 +32,7 @@
       <div class="bg-medium-dark-blue p-6 rounded-lg border border-dark">
         <h2 class="text-xl font-bold mb-2">What file types are allowed?</h2>
         <p class="text-lightest-blue/80">
-          You can upload PDF, PNG, JPEG and TXT files as attachments. Other file types are not supported and 
+          You can upload PDF, PNG, JPEG and TXT files as attachments. Other file types are not supported and
           will be rejected by the system.
         </p>
       </div>
