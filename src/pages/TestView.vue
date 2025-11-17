@@ -1,5 +1,7 @@
 <script setup>
 import { ref } from 'vue'
+import { useErrorStore } from '@/stores/error'
+const errorStore = useErrorStore()
 
 import Button from '@/components/atoms/Button.vue'
 import InputField from '@/components/atoms/InputField.vue'
@@ -13,6 +15,13 @@ const password = ref('')
 const selected = ref('')
 const anonymous = ref(false)
 const public_or_private = ref('')
+
+function submitForm() {
+  if (!email.value || !password.value || !username.value) {
+    errorStore.triggerError('Please fill in all required fields.')
+    return
+  }
+}
 </script>
 
 <template>
@@ -49,7 +58,7 @@ const public_or_private = ref('')
 
       <!-- Submit Button -->
       <div>
-        <Button type="primary" class="w-full">Submit</Button>
+        <Button type="primary" class="w-full" @click="submitForm">Submit</Button>
       </div>
     </div>
   </div>
