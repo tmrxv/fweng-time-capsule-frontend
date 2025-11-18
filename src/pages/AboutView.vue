@@ -9,9 +9,6 @@ const stats = {
   attachments: 15,
 }
 
-function handleCreate() {
-  console.log('Create new capsule')
-}
 </script>
 
 <template>

@@ -12,7 +12,7 @@ export interface Capsule {
   hasAttachment?: boolean
 }
 
-const props = defineProps<{
+defineProps<{
   capsules: Capsule[]
 }>()
 

@@ -1,17 +1,9 @@
 <script setup lang="ts">
 import DashboardStats from '@/components/organisms/DashboardStats.vue'
 import TimeCapsuleList from '@/components/organisms/TimeCapsuleList.vue'
-import FormActions from '@/components/molecules/FormActions.vue'
 import Button from '@/components/atoms/Button.vue'
+import type { Capsule } from '@/components/organisms/TimeCapsuleList.vue'
 
-type Capsule = {
-  id?: string | number
-  title: string
-  preview?: string
-  message?: string
-  deliveryDate?: string
-  visibility?: 'public' | 'private' | string
-}
 
 defineProps({
   stats: {
@@ -23,8 +15,12 @@ defineProps({
     default: () => [] as Capsule[],
   },
 })
+const emit = defineEmits(['create', 'view', 'select'])
 
-const emit = defineEmits(['create', 'view'])
+function handleSelect(capsule: Capsule) {
+  emit('select', capsule)
+}
+
 </script>
 
 <template>

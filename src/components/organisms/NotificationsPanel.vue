@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import NotificationBanner from '@/components/molecules/NotificationBanner.vue'
 
-const props = defineProps({
+defineProps({
   notifications: {
-    type: Array as () => Array<Record<string, any>>,
+    type: Array as () => Array<Record<string, unknown>>,
     default: () => [],
   },
 })
