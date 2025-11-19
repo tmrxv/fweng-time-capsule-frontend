@@ -3,10 +3,8 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useErrorStore } from '@/stores/error'
 import LabeledInput from '@/components/molecules/LabeledInput.vue'
-import LabeledCheckBox from '@/components/molecules/LabeledCheckBox.vue'
 import FormActions from '@/components/molecules/FormActions.vue'
 import NotificationBanner from '@/components/molecules/NotificationBanner.vue'
-import InputField from '@/components/atoms/InputField.vue'
 import Dropdown from '@/components/atoms/Dropdown.vue'
 
 const router = useRouter()
@@ -78,11 +76,13 @@ const handleSignUp = async () => {
 const handleSignIn = () => {
   router.push({ name: 'sign-in' })
 }
+
+const show_notification = ref(true)
 </script>
 
 <template>
   <div
-    class="min-h-screen bg-surface text-gray-900 dark:text-gray-100 dark:bg-[#061025] flex items-center justify-center px-4"
+    class="min-h-screen text-gray-900 dark:text-gray-100 dark:bg-[#061025] flex items-center justify-center px-4"
   >
     <div class="w-full max-w-md">
       <div class="space-y-6">
@@ -93,7 +93,12 @@ const handleSignIn = () => {
           </p>
         </div>
 
-        <NotificationBanner type="info" message="Fill in your details to get started." />
+        <NotificationBanner
+          v-if="show_notification"
+          type="info"
+          message="Fill in your details to get started."
+          @close="show_notification = false"
+        />
 
         <form @submit.prevent="handleSignUp" class="space-y-4">
           <LabeledInput

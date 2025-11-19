@@ -13,10 +13,10 @@
   html,
   body {
     font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    background-color: dark;
   }
 }
 
-/* Optional smooth transition for theme */
 html {
   background-color: dark;
   transition:
