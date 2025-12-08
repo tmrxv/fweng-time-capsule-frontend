@@ -22,7 +22,7 @@ const handleSignIn = async () => {
   isLoading.value = true
   try {
     // TODO: Replace with actual API call
-    console.log('Sign in attempt:', { email: email.value, password: password.value })
+    console.log('Sign in attempt:', { email: email.value })
 
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 500))
@@ -38,11 +38,12 @@ const handleSignIn = async () => {
 const handleSignUp = () => {
   router.push({ name: 'sign-up' })
 }
+const show_notification = ref(true)
 </script>
 
 <template>
   <div
-    class="min-h-screen bg-surface text-gray-900 dark:text-gray-100 dark:bg-[#061025] flex items-center justify-center px-4"
+    class="min-h-screen text-gray-900 dark:text-gray-100 dark:bg-[#061025] flex items-center justify-center"
   >
     <div class="w-full max-w-md">
       <div class="space-y-6">
@@ -51,7 +52,12 @@ const handleSignUp = () => {
           <p class="text-gray-600 dark:text-gray-400 mt-2">Sign in to your account</p>
         </div>
 
-        <NotificationBanner type="info" message="Enter your credentials to continue." />
+        <NotificationBanner
+          v-if="show_notification"
+          @close="show_notification = false"
+          type="info"
+          message="Enter your credentials to continue."
+        />
 
         <form @submit.prevent="handleSignIn" class="space-y-4">
           <LabeledInput

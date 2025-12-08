@@ -18,6 +18,8 @@ const props = defineProps({
   },
 })
 
+const show = true
+
 const emit = defineEmits(['close'])
 
 const typeClasses = {
@@ -34,13 +36,7 @@ const typeClasses = {
     :class="typeClasses[type] || typeClasses.info"
   >
     <span class="mt-0.5">
-      {{ type === 'success'
-        ? '✔'
-        : type === 'error'
-          ? '✖'
-          : type === 'warning'
-            ? '⚠'
-            : 'ℹ' }}
+      {{ type === 'success' ? '✔' : type === 'error' ? '✖' : type === 'warning' ? '⚠' : 'ℹ' }}
     </span>
 
     <div class="flex-1">
