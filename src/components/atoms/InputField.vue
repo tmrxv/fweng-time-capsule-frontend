@@ -18,7 +18,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'focus', 'blur'])
 
 // Base styles
 const base =
@@ -51,5 +51,7 @@ const classes = computed(() => `${base} ${sizeClasses.value} ${colorClasses.valu
     :disabled="disabled"
     :value="modelValue"
     @input="$emit('update:modelValue', $event.target.value)"
+    @focus="$emit('focus')"
+    @blur="$emit('blur')"
   />
 </template>

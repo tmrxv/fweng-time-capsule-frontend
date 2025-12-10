@@ -33,7 +33,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'focus', 'blur'])
 
 const innerValue = computed({
   get: () => props.modelValue,
@@ -44,11 +44,7 @@ const innerValue = computed({
 <template>
   <div class="flex flex-col gap-1">
     <!-- Label -->
-    <label
-      v-if="label"
-      :for="id"
-      class="text-sm font-medium text-lightest-blue"
-    >
+    <label v-if="label" :for="id" class="text-sm font-medium text-lightest-blue">
       {{ label }}
     </label>
 
@@ -60,8 +56,8 @@ const innerValue = computed({
       :size="size"
       :disabled="disabled"
       v-bind="{ id }"
+      @focus="emit('focus')"
+      @blur="emit('blur')"
     />
   </div>
 </template>
-
-
