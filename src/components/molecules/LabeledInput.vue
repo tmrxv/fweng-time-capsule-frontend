@@ -33,7 +33,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['update:modelValue', 'focus', 'blur'])
+const emit = defineEmits(['update:modelValue'])
 
 const innerValue = computed({
   get: () => props.modelValue,
@@ -56,8 +56,6 @@ const innerValue = computed({
       :size="size"
       :disabled="disabled"
       v-bind="{ id }"
-      @focus="emit('focus')"
-      @blur="emit('blur')"
     />
   </div>
 </template>
