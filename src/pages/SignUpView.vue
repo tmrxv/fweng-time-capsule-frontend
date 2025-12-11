@@ -5,7 +5,7 @@ import { useErrorStore } from '@/stores/error'
 import LabeledInput from '@/components/molecules/LabeledInput.vue'
 import FormActions from '@/components/molecules/FormActions.vue'
 import NotificationBanner from '@/components/molecules/NotificationBanner.vue'
-import Dropdown from '@/components/atoms/Dropdown.vue'
+import LabeledSelect from '@/components/molecules/LabeledSelect.vue'
 import { object, string, ref as yupRef } from 'yup'
 import axios from 'axios'
 import CountryAutocomplete from '@/components/organisms/CountryAutocomplete.vue'
@@ -24,18 +24,18 @@ const show_notification = ref(true)
 const country = ref('')
 const countryCode = ref('')
 
-const handleCountrySelect = (item) => {
+const handleCountrySelect = (item: { name: string; code: string }) => {
   country.value = item.name
-  countryCode.value = item.code // <-- this is what API needs!
+  countryCode.value = item.code
 }
 
 // Yup Schema
 let signUpSchema = object({
   email: string().email().required(),
   username: string().min(3).max(20).required(),
-  gender: string().oneOf(['male', 'female', 'other'], '').required(),
+  gender: string().oneOf(['Male', 'Female', 'Other'], '').required(),
   genderOther: string().when('gender', {
-    is: 'other',
+    is: 'Other',
     then: (s) => s.required('Please specify your gender').max(30, 'Max length is 30 characters'),
     otherwise: (s) => s.optional(),
   }),
@@ -62,6 +62,9 @@ const handleSignUp = async () => {
   }
   try {
     await signUpSchema.validate(formdata, { abortEarly: false })
+    if (gender.value === 'Other') {
+      gender.value = genderOther.value
+    }
 
     isLoading.value = true
 
@@ -82,24 +85,25 @@ const handleSignUp = async () => {
     if (!response || response.status >= 400) {
       throw new Error('Registration failed')
     }
-    router.push({ name: 'home' })
+    router.push({ name: 'sign-in' })
   } catch (err) {
     // Yup validation error
-    if (err.inner) {
-      const messages = err.inner.map((e) => e.message).join('\n')
+    if (err instanceof Object && 'inner' in err) {
+      const messages = (err as any).inner.map((e: any) => e.message)
       errorStore.triggerError(messages)
       return
     }
 
     // Axios error
     if (axios.isAxiosError(err)) {
-      const msg = err.response?.data?.message || err.response?.data || 'Registration failed'
+      const msg =
+        err.response?.data?.message || err.response?.data || 'Registration failed. API error.'
       errorStore.triggerError(msg)
       return
     }
 
     // Fallback error
-    errorStore.triggerError(err.message || 'Sign up failed')
+    errorStore.triggerError((err as any).message || 'Sign up failed')
   } finally {
     isLoading.value = false
   }
@@ -164,24 +168,29 @@ const handleSignIn = () => {
           />
 
           <div>
-            <label class="text-sm font-medium text-lightest-blue"> Gender </label>
-            <div class="flex gap-3">
-              <Dropdown
-                v-model="gender"
-                :options="['male', 'female', 'other']"
-                placeholder="Select gender"
-                size="md"
-                class="flex-1"
-                required
-              />
-              <LabeledInput
-                v-if="gender === 'other'"
-                label=""
-                type="text"
-                v-model="genderOther"
-                placeholder="Specify gender"
-                required
-              />
+            <div class="flex gap-3 items-end">
+              <div class="flex-1">
+                <LabeledSelect
+                  label="Gender"
+                  v-model="gender"
+                  :options="['Male', 'Female', 'Other']"
+                  placeholder="Select gender"
+                  size="md"
+                  required
+                />
+              </div>
+
+              <div class="flex-1">
+                <LabeledInput
+                  v-if="gender === 'Other'"
+                  label=""
+                  type="text"
+                  v-model="genderOther"
+                  placeholder="Please specify"
+                  size="md"
+                  required
+                />
+              </div>
             </div>
           </div>
           <CountryAutocomplete v-model="country" @select="handleCountrySelect" />
