@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../pages/HomeView.vue'
+import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,7 +28,7 @@ const router = createRouter({
       name: 'sign-up',
       component: () => import('../pages/SignUpView.vue'),
     },
-        {
+    {
       path: '/capsules',
       name: 'capsules',
       component: () => import('../pages/CapsulesView.vue'),
@@ -46,8 +47,20 @@ const router = createRouter({
       path: '/imprint',
       name: 'imprint',
       component: () => import('../pages/ImprintView.vue'),
-    }
+    },
   ],
+})
+
+router.beforeEach((to) => {
+  const auth = useAuthStore()
+
+  if (to.meta.requiresAuth && !auth.isAuthenticated) {
+    return { name: 'sign-in' }
+  }
+
+  if (to.meta.role && auth.role !== to.meta.role) {
+    return { name: 'forbidden' }
+  }
 })
 
 export default router

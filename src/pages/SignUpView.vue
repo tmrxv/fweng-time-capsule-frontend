@@ -8,6 +8,7 @@ import NotificationBanner from '@/components/molecules/NotificationBanner.vue'
 import LabeledSelect from '@/components/molecules/LabeledSelect.vue'
 import { object, string, ref as yupRef } from 'yup'
 import axios from 'axios'
+import api from '@/plugins/axios'
 import CountryAutocomplete from '@/components/organisms/CountryAutocomplete.vue'
 
 // Refs
@@ -32,7 +33,7 @@ const handleCountrySelect = (item: { name: string; code: string }) => {
 // Yup Schema
 let signUpSchema = object({
   email: string().email().required(),
-  username: string().min(3).max(20).required(),
+  username: string().min(5).max(50).required(),
   gender: string().oneOf(['Male', 'Female', 'Other'], '').required(),
   genderOther: string().when('gender', {
     is: 'Other',
@@ -76,7 +77,7 @@ const handleSignUp = async () => {
       profileImageUrl: '',
     }
 
-    const response = await axios.post('http://localhost:8080/api/auth/register', apiPayload, {
+    const response = await api.post('api/auth/register', apiPayload, {
       headers: {
         'Content-Type': 'application/json',
       },
