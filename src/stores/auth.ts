@@ -31,61 +31,63 @@ function isTokenExpired(token: string | null): boolean {
 export const useAuthStore = defineStore('authStore', {
   state: () => ({
     token: sessionStorage.getItem(STORAGE_KEY) as string | null,
-    payload: null as JwtPayload | null,
     isAuthenticated: false,
-    storedUsername: sessionStorage.getItem('username') as string | null,
+    username: sessionStorage.getItem('username') as string | null,
+    role: sessionStorage.getItem('role') as string | null,
   }),
+
   getters: {
-    role: (state) => state.payload?.role ?? null,
-    username: (state) => state.storedUsername ?? state.payload?.sub ?? null,
-    isTokenExpired: (state) => isTokenExpired(state.token),
+    isAdmin: (state) => state.role === 'ADMIN',
+    isUser: (state) => state.role === 'USER',
   },
+
   actions: {
     init() {
       if (this.token && !isTokenExpired(this.token)) {
-        this.payload = decodeJwt(this.token)
         this.isAuthenticated = true
-        axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`
-        if (this.payload?.exp) {
-          scheduleAutoLogout(this.payload.exp, () => this.logout())
-        } else {
-          this.logout(false)
+        axios.defaults.headers.common.Authorization = `Bearer ${this.token}`
+
+        const payload = decodeJwt(this.token)
+        if (payload?.exp) {
+          scheduleAutoLogout(payload.exp, () => this.logout())
         }
       } else {
         this.logout(false)
       }
     },
-    setToken(token: string) {
-      this.token = token
-      this.payload = decodeJwt(token)
-      this.isAuthenticated = true
 
-      sessionStorage.setItem(STORAGE_KEY, token)
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-
-      if (this.payload?.exp) {
-        scheduleAutoLogout(this.payload.exp, this.logout)
-      }
-    },
     async login(credentials: { email: string; password: string }) {
       const res = await api.post('api/auth/login', credentials)
-      const token = res.data.token
-      this.setToken(token)
-      if (res.data.username) {
-        this.storedUsername = res.data.username
-        sessionStorage.setItem('username', res.data.username)
+
+      this.token = res.data.token
+      this.username = res.data.username
+      this.role = res.data.role
+      this.isAuthenticated = true
+
+      sessionStorage.setItem(STORAGE_KEY, res.data.token)
+      sessionStorage.setItem('username', res.data.username)
+      sessionStorage.setItem('role', res.data.role)
+
+      axios.defaults.headers.common.Authorization = `Bearer ${res.data.token}`
+
+      const payload = decodeJwt(res.data.token)
+      if (payload?.exp) {
+        scheduleAutoLogout(payload.exp, () => this.logout())
       }
     },
+
     logout(redirect = true) {
       this.token = null
-      this.payload = null
+      this.username = null
+      this.role = null
       this.isAuthenticated = false
-      this.storedUsername = null
-      sessionStorage.removeItem(STORAGE_KEY)
-      sessionStorage.removeItem('username')
-      delete axios.defaults.headers.common['Authorization']
+
+      sessionStorage.clear()
+      delete axios.defaults.headers.common.Authorization
+
       logoutTimer && clearTimeout(logoutTimer)
       logoutTimer = null
+
       if (redirect) router.push({ name: 'home' })
     },
   },

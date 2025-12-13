@@ -53,11 +53,13 @@ const router = createRouter({
 
 router.beforeEach((to) => {
   const auth = useAuthStore()
-  auth.init()
 
-  if (to.meta.requiresAuth && auth.isTokenExpired) {
-    auth.logout()
+  if (to.meta.requiresAuth && !auth.isAuthenticated) {
     return { name: 'sign-in' }
+  }
+
+  if (to.meta.role && auth.role !== to.meta.role) {
+    return { name: 'forbidden' }
   }
 })
 

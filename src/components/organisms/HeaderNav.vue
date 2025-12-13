@@ -7,6 +7,7 @@ import Button from '@/components/atoms/Button.vue'
 const authStore = useAuthStore()
 const username = computed(() => authStore.username)
 const isAuthenticated = computed(() => authStore.isAuthenticated)
+const role = computed(() => authStore.role)
 </script>
 
 <template>
