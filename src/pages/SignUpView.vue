@@ -5,69 +5,105 @@ import { useErrorStore } from '@/stores/error'
 import LabeledInput from '@/components/molecules/LabeledInput.vue'
 import FormActions from '@/components/molecules/FormActions.vue'
 import NotificationBanner from '@/components/molecules/NotificationBanner.vue'
-import Dropdown from '@/components/atoms/Dropdown.vue'
+import LabeledSelect from '@/components/molecules/LabeledSelect.vue'
+import { object, string, ref as yupRef } from 'yup'
+import axios from 'axios'
+import CountryAutocomplete from '@/components/organisms/CountryAutocomplete.vue'
 
+// Refs
 const router = useRouter()
 const errorStore = useErrorStore()
-
 const username = ref('')
 const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 const gender = ref('')
 const genderOther = ref('')
-const agreeToTerms = ref(false)
 const isLoading = ref(false)
+const show_notification = ref(true)
+const country = ref('')
+const countryCode = ref('')
+
+const handleCountrySelect = (item: { name: string; code: string }) => {
+  country.value = item.name
+  countryCode.value = item.code
+}
+
+// Yup Schema
+let signUpSchema = object({
+  email: string().email().required(),
+  username: string().min(3).max(20).required(),
+  gender: string().oneOf(['Male', 'Female', 'Other'], '').required(),
+  genderOther: string().when('gender', {
+    is: 'Other',
+    then: (s) => s.required('Please specify your gender').max(30, 'Max length is 30 characters'),
+    otherwise: (s) => s.optional(),
+  }),
+  password: string()
+    .required('Password is required')
+    .min(12, 'Password must be at least 12 characters long')
+    .matches(/[a-z]/, 'Must contain a lowercase letter')
+    .matches(/[A-Z]/, 'Must contain an uppercase letter')
+    .matches(/[0-9]/, 'Must contain a number')
+    .matches(/[^A-Za-z0-9]/, 'Must contain a symbol'),
+  confirmPassword: string().oneOf([yupRef('password')], 'Passwords must match'),
+  country: string().required(),
+})
 
 const handleSignUp = async () => {
-  if (
-    !username.value ||
-    !email.value ||
-    !password.value ||
-    !confirmPassword.value ||
-    !gender.value
-  ) {
-    errorStore.triggerError('Please fill in all fields')
-    return
+  const formdata = {
+    username: username.value,
+    email: email.value,
+    gender: gender.value,
+    genderOther: genderOther.value,
+    password: password.value,
+    confirmPassword: confirmPassword.value,
+    country: country.value,
   }
-
-  if (gender.value === 'other' && !genderOther.value) {
-    errorStore.triggerError('Please specify your gender')
-    return
-  }
-
-  if (password.value !== confirmPassword.value) {
-    errorStore.triggerError('Passwords do not match')
-    return
-  }
-
-  if (password.value.length < 8) {
-    errorStore.triggerError('Password must be at least 8 characters')
-    return
-  }
-
-  if (!agreeToTerms.value) {
-    errorStore.triggerError('You must agree to the terms and conditions')
-    return
-  }
-
-  isLoading.value = true
   try {
-    // TODO: Replace with actual API call
-    const selectedGender = gender.value === 'other' ? genderOther.value : gender.value
-    console.log('Sign up attempt:', {
-      username: username.value,
+    await signUpSchema.validate(formdata, { abortEarly: false })
+    if (gender.value === 'Other') {
+      gender.value = genderOther.value
+    }
+
+    isLoading.value = true
+
+    const apiPayload = {
       email: email.value,
+      username: username.value,
       password: password.value,
-      gender: selectedGender,
+      country: countryCode.value,
+      profileImageUrl: '',
+    }
+
+    const response = await axios.post('http://localhost:8080/api/auth/register', apiPayload, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
     })
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 500))
-
-    router.push({ name: 'home' })
+    if (!response || response.status >= 400) {
+      throw new Error('Registration failed')
+    }
+    router.push({ name: 'sign-in' })
   } catch (err) {
-    errorStore.triggerError('Sign up failed. Please try again.')
+    // Yup validation error
+    if (err instanceof Object && 'inner' in err) {
+      const messages = (err as any).inner.map((e: any) => e.message)
+      errorStore.triggerError(messages)
+      return
+    }
+
+    // Axios error
+    if (axios.isAxiosError(err)) {
+      const msg =
+        err.response?.data?.message || err.response?.data || 'Registration failed. API error.'
+      errorStore.triggerError(msg)
+      return
+    }
+
+    // Fallback error
+    errorStore.triggerError((err as any).message || 'Sign up failed')
   } finally {
     isLoading.value = false
   }
@@ -76,8 +112,6 @@ const handleSignUp = async () => {
 const handleSignIn = () => {
   router.push({ name: 'sign-in' })
 }
-
-const show_notification = ref(true)
 </script>
 
 <template>
@@ -118,10 +152,10 @@ const show_notification = ref(true)
           />
 
           <LabeledInput
-            label="Password"
+            label="Password (incl. upper/lowercase, number & symbol)"
             type="password"
             v-model="password"
-            placeholder="At least 8 characters"
+            placeholder="Enter your password at least 12 characters long"
             required
           />
 
@@ -134,26 +168,32 @@ const show_notification = ref(true)
           />
 
           <div>
-            <label class="block text-sm font-medium mb-2">Gender</label>
-            <div class="flex gap-3">
-              <Dropdown
-                v-model="gender"
-                :options="['Male', 'Female', 'Other']"
-                placeholder="Select gender"
-                size="md"
-                class="flex-1"
-                required
-              />
-              <LabeledInput
-                v-if="gender === 'Other'"
-                label=""
-                type="text"
-                v-model="genderOther"
-                placeholder="Enter your gender"
-                required
-              />
+            <div class="flex gap-3 items-end">
+              <div class="flex-1">
+                <LabeledSelect
+                  label="Gender"
+                  v-model="gender"
+                  :options="['Male', 'Female', 'Other']"
+                  placeholder="Select gender"
+                  size="md"
+                  required
+                />
+              </div>
+
+              <div class="flex-1">
+                <LabeledInput
+                  v-if="gender === 'Other'"
+                  label=""
+                  type="text"
+                  v-model="genderOther"
+                  placeholder="Please specify"
+                  size="md"
+                  required
+                />
+              </div>
             </div>
           </div>
+          <CountryAutocomplete v-model="country" @select="handleCountrySelect" />
 
           <FormActions
             primaryLabel="Sign Up"

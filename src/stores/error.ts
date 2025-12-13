@@ -3,10 +3,10 @@ import { defineStore } from 'pinia'
 export const useErrorStore = defineStore('errorStore', {
   state: () => ({
     show: false as boolean,
-    message: '' as string,
+    message: '' as string | string[],
   }),
   actions: {
-    triggerError(message: string) {
+    triggerError(message: string | string[]) {
       this.show = true
       this.message = message
     },
@@ -16,5 +16,3 @@ export const useErrorStore = defineStore('errorStore', {
     },
   },
 })
-
-export type ErrorState = ReturnType<typeof useErrorStore>

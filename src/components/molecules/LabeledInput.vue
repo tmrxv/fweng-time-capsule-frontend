@@ -44,11 +44,7 @@ const innerValue = computed({
 <template>
   <div class="flex flex-col gap-1">
     <!-- Label -->
-    <label
-      v-if="label"
-      :for="id"
-      class="text-sm font-medium text-lightest-blue"
-    >
+    <label v-if="label" :for="id" class="text-sm font-medium text-lightest-blue">
       {{ label }}
     </label>
 
@@ -63,5 +59,3 @@ const innerValue = computed({
     />
   </div>
 </template>
-
-
