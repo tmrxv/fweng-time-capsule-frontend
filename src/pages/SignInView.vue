@@ -2,34 +2,37 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useErrorStore } from '@/stores/error'
+import { useAuthStore } from '@/stores/auth'
 import LabeledInput from '@/components/molecules/LabeledInput.vue'
 import FormActions from '@/components/molecules/FormActions.vue'
 import NotificationBanner from '@/components/molecules/NotificationBanner.vue'
+import * as yup from 'yup'
 
 const router = useRouter()
 const errorStore = useErrorStore()
+const authStore = useAuthStore()
 
 const email = ref('')
 const password = ref('')
 const isLoading = ref(false)
 
-const handleSignIn = async () => {
-  if (!email.value || !password.value) {
-    errorStore.triggerError('Please fill in all fields')
-    return
-  }
+const validationSchema = yup.object({
+  email: yup.string().email('Invalid email').required('Email is required'),
+  password: yup.string().required('Password is required'),
+})
 
+const handleSignIn = async () => {
   isLoading.value = true
   try {
-    // TODO: Replace with actual API call
-    console.log('Sign in attempt:', { email: email.value })
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 500))
-
+    await validationSchema.validate({ email: email.value, password: password.value })
+    await authStore.login({ email: email.value, password: password.value })
     router.push({ name: 'home' })
   } catch (err) {
-    errorStore.triggerError('Sign in failed. Please try again.')
+    if (err instanceof yup.ValidationError) {
+      errorStore.triggerError(err.message)
+      return
+    }
+    errorStore.triggerError('Failed to sign in. Please check your credentials and try again.')
   } finally {
     isLoading.value = false
   }
