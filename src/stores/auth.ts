@@ -48,6 +48,10 @@ export const useAuthStore = defineStore('authStore', {
         axios.defaults.headers.common.Authorization = `Bearer ${this.token}`
 
         const payload = decodeJwt(this.token)
+        if (payload?.role) {
+          this.role = payload.role
+          sessionStorage.setItem('role', payload.role)
+        }
         if (payload?.exp) {
           scheduleAutoLogout(payload.exp, () => this.logout())
         }

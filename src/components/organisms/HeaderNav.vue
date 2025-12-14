@@ -20,7 +20,8 @@ const role = computed(() => authStore.role)
       <nav class="hidden md:flex gap-3 text-white">
         <router-link to="/" class="hover:underline">Home</router-link>
         <router-link to="/about" class="hover:underline">About</router-link>
-        <router-link to="/capsules" class="hover:underline">Capsules</router-link>
+        <router-link v-if="isAuthenticated" to="/capsules" class="hover:underline">My Capsules</router-link>
+        <router-link v-else to="/explore" class="hover:underline">Explore</router-link>
         <router-link to="/help" class="hover:underline">Help</router-link>
         <router-link to="/imprint" class="hover:underline">Imprint</router-link>
       </nav>
@@ -29,6 +30,11 @@ const role = computed(() => authStore.role)
     <div class="flex items-center gap-4 ml-auto">
       <template v-if="isAuthenticated">
         <span class="text-white">Hello, {{ username }}</span>
+
+        <Button v-if="role === 'ADMIN'" type="primary" size="sm" title="Visible only for admins">
+         Admin
+        </Button>
+
         <Button type="secondary" size="sm" @click="authStore.logout()"> Logout </Button>
       </template>
 
