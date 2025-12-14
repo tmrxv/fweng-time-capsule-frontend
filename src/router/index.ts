@@ -22,16 +22,19 @@ const router = createRouter({
       path: '/sign-in',
       name: 'sign-in',
       component: () => import('../pages/SignInView.vue'),
+      meta: { guestOnly: true },
     },
     {
       path: '/sign-up',
       name: 'sign-up',
       component: () => import('../pages/SignUpView.vue'),
+      meta: { guestOnly: true },
     },
     {
       path: '/capsules',
       name: 'capsules',
       component: () => import('../pages/CapsulesView.vue'),
+      meta: { requiresAuth: true },
     },
     {
       path: '/explore',
@@ -54,13 +57,17 @@ const router = createRouter({
 router.beforeEach((to) => {
   const auth = useAuthStore()
 
+  // Logged-in users must NOT access sign-in or sign-up pages
+  if (to.meta.guestOnly && auth.isAuthenticated) {
+    return { name: 'home' }
+  }
+
+  // Guests must NOT access protected routes
   if (to.meta.requiresAuth && !auth.isAuthenticated) {
     return { name: 'sign-in' }
   }
 
-  if (to.meta.role && auth.role !== to.meta.role) {
-    return { name: 'forbidden' }
-  }
+  return true
 })
 
 export default router
