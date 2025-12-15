@@ -5,6 +5,8 @@ import TimeCapsuleCard from '@/components/molecules/TimeCapsuleCard.vue'
 import StatsRow from '@/components/molecules/StatsRow.vue'
 import NotificationBanner from '@/components/molecules/NotificationBanner.vue'
 import DarkSwitcher from '@/components/atoms/DarkSwitcher.vue'
+import { computed } from 'vue'
+import { useAuthStore } from '@/stores/auth'
 
 const stats = ref([
   { label: 'Capsules', value: 128 },
@@ -27,6 +29,10 @@ const recent = ref([
     excerpt: 'New Year resolutions stored for later.',
   },
 ])
+
+const authStore = useAuthStore()
+const isAuthenticated = computed(() => authStore.isAuthenticated)
+
 </script>
 
 <template>
@@ -59,7 +65,7 @@ const recent = ref([
             <StatsRow :items="stats" />
           </div>
 
-          <div class="mt-8 flex items-center gap-3">
+          <div v-if="!isAuthenticated" class="mt-8 flex items-center gap-3">
             <router-link to="/sign-in" class="inline-block text-primary hover:underline px-4 py-2"
               >Sign In</router-link
             >
