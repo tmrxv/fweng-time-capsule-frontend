@@ -31,6 +31,10 @@ const role = computed(() => authStore.role)
       <template v-if="isAuthenticated">
         <span class="text-white">Hello, {{ username }}</span>
 
+        <RouterLink to="/profile">
+          <Button type="primary" size="sm">Profile</Button>
+        </RouterLink>
+
         <Button v-if="role === 'ADMIN'" type="primary" size="sm" title="Visible only for admins">
          Admin
         </Button>

@@ -51,6 +51,12 @@ const router = createRouter({
       name: 'imprint',
       component: () => import('../pages/ImprintView.vue'),
     },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: () => import('../pages/ProfileView.vue'),
+      meta: { requiresAuth: true },
+    },
   ],
 })
 

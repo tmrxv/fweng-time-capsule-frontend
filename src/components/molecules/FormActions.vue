@@ -21,11 +21,11 @@ const emit = defineEmits(['primary', 'secondary'])
 
 <template>
   <div class="flex justify-end gap-3 mt-4">
-    <Button type="outline" size="md" @click="emit('secondary')">
+    <Button type="outline" size="md" htmlType="button" @click="emit('secondary')">
       {{ secondaryLabel }}
     </Button>
 
-    <Button type="primary" size="md" :disabled="primaryDisabled" @click="emit('primary')">
+    <Button type="primary" size="md" htmlType="submit" :disabled="primaryDisabled" @click.prevent="emit('primary')">
       {{ primaryLabel }}
     </Button>
   </div>
