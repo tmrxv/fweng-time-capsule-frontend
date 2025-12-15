@@ -14,6 +14,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  htmlType: {
+    type: String,
+    default: 'button', // 'button' | 'submit' | 'reset'
+  },
 })
 
 const base =
@@ -41,7 +45,7 @@ const classes = computed(() => `${base} ${sizeClasses.value} ${variantClasses.va
 </script>
 
 <template>
-  <button :class="classes" :disabled="disabled">
+  <button :class="classes" :disabled="disabled" :type="htmlType">
     <slot />
   </button>
 </template>

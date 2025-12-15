@@ -34,12 +34,8 @@ export const useAuthStore = defineStore('authStore', {
     isAuthenticated: false,
     username: sessionStorage.getItem('username') as string | null,
     role: sessionStorage.getItem('role') as string | null,
+    id: sessionStorage.getItem('id') as string | null,
   }),
-
-  getters: {
-    isAdmin: (state) => state.role === 'ADMIN',
-    isUser: (state) => state.role === 'USER',
-  },
 
   actions: {
     init() {
@@ -68,9 +64,14 @@ export const useAuthStore = defineStore('authStore', {
       this.role = res.data.role
       this.isAuthenticated = true
 
+      // Prefer explicit id from response; fall back to JWT `sub` if absent
+      const incomingId = res.data.id ?? decodeJwt(res.data.token)?.sub ?? null
+      this.id = incomingId !== null ? String(incomingId) : null
+
       sessionStorage.setItem(STORAGE_KEY, res.data.token)
-      sessionStorage.setItem('username', res.data.username)
-      sessionStorage.setItem('role', res.data.role)
+      if (this.username) sessionStorage.setItem('username', this.username)
+      if (this.id) sessionStorage.setItem('id', String(this.id))
+      if (this.role) sessionStorage.setItem('role', this.role)
 
       axios.defaults.headers.common.Authorization = `Bearer ${res.data.token}`
 
@@ -80,17 +81,21 @@ export const useAuthStore = defineStore('authStore', {
       }
     },
 
+
     logout(redirect = true) {
       this.token = null
       this.username = null
       this.role = null
+      this.id = null
       this.isAuthenticated = false
 
       sessionStorage.clear()
       delete axios.defaults.headers.common.Authorization
 
-      logoutTimer && clearTimeout(logoutTimer)
-      logoutTimer = null
+      if (logoutTimer) {
+        clearTimeout(logoutTimer)
+        logoutTimer = null
+      }
 
       if (redirect) router.push({ name: 'home' })
     },
@@ -107,7 +112,9 @@ function scheduleAutoLogout(exp: number, logout: () => void) {
     return
   }
 
-  logoutTimer && clearTimeout(logoutTimer)
+  if (logoutTimer) {
+    clearTimeout(logoutTimer)
+  }
   logoutTimer = setTimeout(() => {
     logout()
   }, expiresInMs)
