@@ -14,17 +14,13 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  htmlType: {
-    type: String,
-    default: 'button',
-  },
 })
 
 const { classes } = useButtonStyles(props)
 </script>
 
 <template>
-  <button :class="classes" :disabled="disabled" :type="htmlType">
+  <span :class="classes">
     <slot />
-  </button>
+  </span>
 </template>

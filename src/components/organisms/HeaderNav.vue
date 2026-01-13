@@ -3,6 +3,7 @@ import { RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { computed } from 'vue'
 import Button from '@/components/atoms/Button.vue'
+import ButtonStyleText from '@/components/atoms/ButtonStyleText.vue'
 
 const authStore = useAuthStore()
 const username = computed(() => authStore.username)
@@ -20,7 +21,9 @@ const role = computed(() => authStore.role)
       <nav class="hidden md:flex gap-3 text-white">
         <router-link to="/" class="hover:underline">Home</router-link>
         <router-link to="/about" class="hover:underline">About</router-link>
-        <router-link v-if="isAuthenticated" to="/capsules" class="hover:underline">My Capsules</router-link>
+        <router-link v-if="isAuthenticated" to="/capsules" class="hover:underline"
+          >My Capsules</router-link
+        >
         <router-link v-else to="/explore" class="hover:underline">Explore</router-link>
         <router-link to="/help" class="hover:underline">Help</router-link>
         <router-link to="/imprint" class="hover:underline">Imprint</router-link>
@@ -32,22 +35,27 @@ const role = computed(() => authStore.role)
         <span class="text-white">Hello, {{ username }}</span>
 
         <RouterLink to="/profile">
-          <Button type="primary" size="sm">Profile</Button>
+          <ButtonStyleText type="primary" size="sm">Profile</ButtonStyleText>
         </RouterLink>
 
-        <Button v-if="role === 'ADMIN'" type="primary" size="sm" title="Visible only for admins">
-         Admin
-        </Button>
+        <ButtonStyleText
+          v-if="role === 'ADMIN'"
+          type="primary"
+          size="sm"
+          title="Visible only for admins"
+        >
+          Admin
+        </ButtonStyleText>
 
         <Button type="secondary" size="sm" @click="authStore.logout()"> Logout </Button>
       </template>
 
       <template v-else>
         <RouterLink to="/sign-in">
-          <Button type="primary" size="sm">Sign In</Button>
+          <ButtonStyleText type="primary" size="sm">Sign In</ButtonStyleText>
         </RouterLink>
         <RouterLink to="/sign-up">
-          <Button type="secondary" size="sm">Sign Up</Button>
+          <ButtonStyleText type="secondary" size="sm">Sign Up</ButtonStyleText>
         </RouterLink>
       </template>
     </div>
