@@ -37,6 +37,24 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/capsules/create',
+      name: 'create-capsule',
+      component: () => import('../pages/CreateCapsuleView.vue'),
+      meta: { requiresAuth: true },
+    },
+    /*     {
+      path: '/capsules/:id',
+      name: 'capsule-details',
+      component: () => import('../pages/CapsuleDetailsView.vue'),
+      meta: { requiresAuth: true },
+    }, */
+    {
+      path: '/capsules/:id/edit',
+      name: 'edit-capsule',
+      component: () => import('../pages/EditCapsuleView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/explore',
       name: 'explore',
       component: () => import('../pages/CapsulesView.vue'),

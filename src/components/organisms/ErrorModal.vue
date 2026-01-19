@@ -6,7 +6,7 @@ const errorStore = useErrorStore()
 </script>
 
 <template>
-  <Modal :open="errorStore.show" @close="errorStore.clearError()">
+  <Modal :open="errorStore.show" @close="errorStore.clearError()" :show-close-button="true">
     <h2 class="text-xl font-bold mb-4">Error</h2>
     <p
       v-if="typeof errorStore.message === 'string'"
