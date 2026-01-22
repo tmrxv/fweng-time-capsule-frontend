@@ -10,6 +10,8 @@ const route = useRoute()
 const capsuleStore = useTimeCapsuleStore()
 const capsuleId = Number(route.params.id)
 const initialData = ref<Partial<TimeCapsulePostRequest> | null>(null)
+const existingAttachmentUrl = ref<string>('')
+const existingAttachmentFileName = ref<string>('')
 const isLoading = ref(true)
 
 onMounted(async () => {
@@ -19,6 +21,30 @@ onMounted(async () => {
       title: capsule.title,
       message: capsule.message,
       sendAt: capsule.sendAt,
+    }
+    const url = (capsule as any).attachmentUrl || (capsule as any).fileUrl || ''
+    existingAttachmentUrl.value = url
+    // Prefer explicit filename if provided; else derive from URL
+    const explicitName = (capsule as any).attachmentFileName || ''
+    if (explicitName) {
+      existingAttachmentFileName.value = explicitName
+    } else if (url) {
+      try {
+        const parsed = new URL(url)
+        const lastSeg = parsed.pathname.split('/').filter(Boolean).pop() || ''
+        let decoded = decodeURIComponent(lastSeg)
+        // Strip UUID prefix (format: uuid-originalname.ext)
+        const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}-(.+)$/i
+        const match = decoded.match(uuidPattern)
+        if (match) {
+          decoded = match[1]
+        }
+        existingAttachmentFileName.value = decoded
+      } catch {
+        existingAttachmentFileName.value = 'View file'
+      }
+    } else {
+      existingAttachmentFileName.value = ''
     }
   } catch (error) {
     console.error('Failed to load capsule:', error)
@@ -51,6 +77,8 @@ function handleCancel() {
       <TimeCapsuleForm
         v-if="!isLoading && initialData"
         :initial-data="initialData"
+        :existing-attachment-url="existingAttachmentUrl"
+        :existing-attachment-file-name="existingAttachmentFileName"
         :is-loading="capsuleStore.loading"
         @submit="handleSubmit"
         @cancel="handleCancel"

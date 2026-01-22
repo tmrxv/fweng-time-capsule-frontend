@@ -26,7 +26,7 @@ const capsules = computed(() =>
         deliveryDate: c.sendAt,
         visibility: (c as any).visibility || 'PRIVATE',
         createdAt: c.createdAt,
-        hasAttachment: !!(c as any).attachmentUrl,
+        hasAttachment: Boolean((c as any).attachmentUrl || (c as any).fileUrl),
         userId: c.userId,
       }) as Capsule,
   ),
