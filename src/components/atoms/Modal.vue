@@ -2,6 +2,8 @@
 import AppButton from '@/components/atoms/Button.vue'
 const props = defineProps<{
   open: boolean
+  title?: string
+  showCloseButton?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -20,14 +22,24 @@ function closeModal() {
     @click.self="closeModal"
   >
     <div
-      class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md"
+      class="bg-[#071428] dark:bg-[#061025] rounded-xl shadow-xl p-6 w-full max-w-md border border-gray-800"
       @keydown.esc="closeModal"
       tabindex="0"
     >
-      <slot></slot>
-      <AppButton type="primary" size="md" class="mt-4 w-full" @click="closeModal">
-        Close
-      </AppButton>
+      <div v-if="title" class="mb-4">
+        <h2 class="text-xl font-semibold text-lightest-blue">{{ title }}</h2>
+      </div>
+
+      <div class="text-lightest-blue/80 mb-6">
+        <slot></slot>
+      </div>
+
+      <div class="flex gap-3 justify-end">
+        <AppButton v-if="showCloseButton" type="secondary" size="md" @click="closeModal">
+          Close
+        </AppButton>
+        <slot name="actions"></slot>
+      </div>
     </div>
   </div>
 </template>

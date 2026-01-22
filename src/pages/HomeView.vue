@@ -1,18 +1,17 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import HeaderNav from '@/components/organisms/HeaderNav.vue'
+import { ref, computed, onMounted } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router'
+import { useTimeCapsuleStore } from '@/stores/TimeCapsules'
 import TimeCapsuleCard from '@/components/molecules/TimeCapsuleCard.vue'
 import StatsRow from '@/components/molecules/StatsRow.vue'
-import NotificationBanner from '@/components/molecules/NotificationBanner.vue'
-import DarkSwitcher from '@/components/atoms/DarkSwitcher.vue'
-import { computed } from 'vue'
-import { useAuthStore } from '@/stores/auth'
+import DashboardOverview from '@/components/organisms/DashboardOverview.vue'
+import Button from '@/components/atoms/Button.vue'
+import type { Capsule } from '@/components/organisms/TimeCapsuleList.vue'
 
-const stats = ref([
-  { label: 'Capsules', value: 128 },
-  { label: 'Members', value: 3_542 },
-  { label: 'Opened', value: 84 },
-])
+const router = useRouter()
+const authStore = useAuthStore()
+const capsuleStore = useTimeCapsuleStore()
 
 const recent = ref([
   {
@@ -30,14 +29,54 @@ const recent = ref([
   },
 ])
 
-const authStore = useAuthStore()
 const isAuthenticated = computed(() => authStore.isAuthenticated)
 
+onMounted(async () => {
+  if (isAuthenticated.value) {
+    await capsuleStore.fetchAllCapsules()
+  }
+})
+
+function handleCreateCapsule() {
+  router.push({ name: 'create-capsule' })
+}
+
+function handleViewAll() {
+  router.push({ name: 'capsules' })
+}
+
+function handleSelectCapsule(capsule: Capsule) {
+  console.log('Selected capsule:', capsule)
+  // Could navigate to detail view or edit view
+}
 </script>
 
 <template>
   <div class="min-h-screen bg-surface text-gray-900 dark:text-gray-100 dark:bg-[#061025]">
-    <main class="max-w-6xl mx-auto px-6 py-12">
+    <!-- Authenticated User View -->
+    <main v-if="isAuthenticated" class="max-w-4xl mx-auto px-6 py-12">
+      <div class="text-center mb-12">
+        <h1 class="text-4xl font-extrabold mb-4">Welcome back, {{ authStore.username }}</h1>
+        <p class="text-gray-600 dark:text-gray-400 mb-8">
+          Manage your time capsules and view your statistics.
+        </p>
+        <Button
+          @click="handleCreateCapsule"
+          class="bg-blue-600 hover:bg-blue-700 px-8 py-3 text-lg"
+        >
+          + Create Time Capsule
+        </Button>
+      </div>
+
+      <div class="mt-12">
+        <h2 class="text-2xl font-bold mb-6">Your Capsules</h2>
+        <router-link to="/capsules" class="text-primary hover:underline font-medium">
+          View all your time capsules →
+        </router-link>
+      </div>
+    </main>
+    <!-- Guest View -->
+    <main v-else class="max-w-6xl mx-auto px-6 py-12">
       <section class="grid gap-8 lg:grid-cols-2 items-center">
         <div>
           <h1 class="text-4xl sm:text-5xl font-extrabold leading-tight">
@@ -59,10 +98,6 @@ const isAuthenticated = computed(() => authStore.isAuthenticated)
               class="inline-block border border-muted text-muted px-4 py-2 rounded-lg"
               >Explore Capsules</router-link
             >
-          </div>
-
-          <div class="mt-8">
-            <StatsRow :items="stats" />
           </div>
 
           <div v-if="!isAuthenticated" class="mt-8 flex items-center gap-3">

@@ -10,18 +10,30 @@ export interface Capsule {
   visibility: 'PUBLIC' | 'PRIVATE'
   createdAt?: string
   hasAttachment?: boolean
+  userId?: number
 }
 
 defineProps<{
   capsules: Capsule[]
+  currentUserId?: number
 }>()
 
 const emit = defineEmits<{
-  (e: 'select', capsule: Capsule): void
+  select: [capsule: Capsule]
+  edit: [id: number]
+  delete: [id: number]
 }>()
 
 function handleClick(capsule: Capsule) {
   emit('select', capsule)
+}
+
+function handleEdit(id: number) {
+  emit('edit', id)
+}
+
+function handleDelete(id: number) {
+  emit('delete', id)
 }
 </script>
 
@@ -32,20 +44,22 @@ function handleClick(capsule: Capsule) {
         <TimeCapsuleCard
           v-for="cap in capsules"
           :key="cap.id"
+          :id="cap.id"
           :title="cap.title"
           :previewText="cap.preview || cap.message"
           :deliveryDate="cap.deliveryDate"
           :visibility="cap.visibility"
           :createdAt="cap.createdAt"
           :hasAttachment="cap.hasAttachment"
+          :isOwner="cap.userId === currentUserId"
           @click="handleClick(cap)"
+          @edit="handleEdit"
+          @delete="handleDelete"
         />
       </div>
     </template>
     <template v-else>
-      <p class="text-gray-500 text-center py-10">
-        No time capsules found.
-      </p>
+      <p class="text-gray-500 text-center py-10">No time capsules found.</p>
     </template>
   </section>
 </template>
