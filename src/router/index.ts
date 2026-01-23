@@ -75,6 +75,12 @@ const router = createRouter({
       component: () => import('../pages/ProfileView.vue'),
       meta: { requiresAuth: true },
     },
+    {
+      path: '/admin',
+      name: 'admin',
+      component: () => import('../pages/AdminView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true },
+    },
   ],
 })
 
@@ -89,6 +95,11 @@ router.beforeEach((to) => {
   // Guests must NOT access protected routes
   if (to.meta.requiresAuth && !auth.isAuthenticated) {
     return { name: 'sign-in' }
+  }
+
+  // Only admins may access admin routes
+  if (to.meta.requiresAdmin && auth.role !== 'ADMIN') {
+    return { name: 'home' }
   }
 
   return true

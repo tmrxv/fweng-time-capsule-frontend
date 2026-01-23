@@ -38,14 +38,11 @@ const role = computed(() => authStore.role)
           <ButtonStyleText type="primary" size="sm">Profile</ButtonStyleText>
         </RouterLink>
 
-        <ButtonStyleText
-          v-if="role === 'ADMIN'"
-          type="primary"
-          size="sm"
-          title="Visible only for admins"
-        >
-          Admin
-        </ButtonStyleText>
+        <RouterLink v-if="role === 'ADMIN'" to="/admin">
+          <ButtonStyleText type="primary" size="sm" title="Visible only for admins">
+            Admin
+          </ButtonStyleText>
+        </RouterLink>
 
         <Button type="secondary" size="sm" @click="authStore.logout()"> Logout </Button>
       </template>
