@@ -3,9 +3,6 @@ import { useAuthStore } from '@/stores/auth'
 
 const api = axios.create({
   baseURL: 'http://localhost:8080',
-  headers: {
-    'Content-Type': 'application/json',
-  },
 })
 
 api.interceptors.request.use((config) => {
@@ -13,6 +10,7 @@ api.interceptors.request.use((config) => {
   if (auth.token) {
     config.headers['Authorization'] = `Bearer ${auth.token}`
   }
+  // Do not force Content-Type here; let axios infer it (JSON vs FormData)
   return config
 })
 

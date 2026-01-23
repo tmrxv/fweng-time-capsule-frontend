@@ -62,9 +62,35 @@ export const useTimeCapsuleStore = defineStore('timeCapsuleStore', {
     async createCapsule(data: TimeCapsulePostRequest) {
       this.loading = true
       try {
-        const response = await api.post('/api/posts', data)
-        this.capsules.push(response.data)
-        return response.data
+        // Step 1: Create capsule with JSON (backend requires @RequestBody)
+        const { attachment, ...jsonPayload } = data
+        const response = await api.post('/api/posts', jsonPayload)
+        let created: TimeCapsulePostResponse = response.data
+        this.capsules.push(created)
+
+        // Step 2: If file selected, upload to /api/posts/{id}/upload as 'file'
+        if (attachment && created.id) {
+          try {
+            const formData = new FormData()
+            formData.append('file', attachment)
+            const uploadRes = await api.post(`/api/posts/${created.id}/upload`, formData)
+            const updated: TimeCapsulePostResponse = uploadRes.data
+
+            // Update local cache
+            const idx = this.capsules.findIndex((c) => c.id === created.id)
+            if (idx !== -1) this.capsules[idx] = updated
+            if (this.selectedCapsule?.id === created.id) this.selectedCapsule = updated
+            created = updated
+          } catch (uploadErr: any) {
+            const errorStore = useErrorStore()
+            const msg =
+              uploadErr?.response?.data?.message || 'Attachment upload failed; capsule created.'
+            errorStore.triggerError(msg)
+            // proceed with created capsule without attachment
+          }
+        }
+
+        return created
       } catch (error: any) {
         const errorStore = useErrorStore()
         const message = error.response?.data?.message || 'Failed to create time capsule'
@@ -78,15 +104,35 @@ export const useTimeCapsuleStore = defineStore('timeCapsuleStore', {
     async updateCapsule(id: number, data: Partial<TimeCapsulePostRequest>) {
       this.loading = true
       try {
-        const response = await api.put(`/api/posts/${id}`, data)
+        // Step 1: Update core fields via JSON
+        const { attachment, ...jsonPayload } = data
+        const response = await api.put(`/api/posts/${id}`, jsonPayload)
+        let updated: TimeCapsulePostResponse = response.data
+
+        // Step 2: If a new file provided, upload it
+        if (attachment) {
+          try {
+            const formData = new FormData()
+            formData.append('file', attachment)
+            const uploadRes = await api.post(`/api/posts/${id}/upload`, formData)
+            updated = uploadRes.data
+          } catch (uploadErr: any) {
+            const errorStore = useErrorStore()
+            const msg =
+              uploadErr?.response?.data?.message || 'Attachment upload failed; details saved.'
+            errorStore.triggerError(msg)
+            // keep JSON update result
+          }
+        }
+
         const index = this.capsules.findIndex((c) => c.id === id)
         if (index !== -1) {
-          this.capsules[index] = response.data
+          this.capsules[index] = updated
         }
         if (this.selectedCapsule?.id === id) {
-          this.selectedCapsule = response.data
+          this.selectedCapsule = updated
         }
-        return response.data
+        return updated
       } catch (error: any) {
         const errorStore = useErrorStore()
         const message = error.response?.data?.message || 'Failed to update time capsule'

@@ -24,6 +24,11 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  // When editing with existing attachment, show different text
+  hasExistingFile: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -69,7 +74,7 @@ function onFileChange(event) {
         :disabled="disabled"
         @click="openFileDialog"
       >
-        Choose file
+        {{ hasExistingFile ? 'Change file' : 'Choose file' }}
       </Button>
 
       <span class="text-xs text-lightest-blue/80 truncate max-w-[180px]">
@@ -78,7 +83,7 @@ function onFileChange(event) {
     </div>
 
     <p class="text-xs text-lightest-blue/60">
-      {{ helperText }}
+      {{ hasExistingFile && !modelValue ? 'Select a new file to replace the existing attachment.' : helperText }}
     </p>
   </div>
 </template>

@@ -14,6 +14,15 @@ const props = defineProps({
     type: Object as () => Partial<TimeCapsulePostRequest> | null,
     default: null,
   },
+  // When editing, we can show existing attachment info
+  existingAttachmentUrl: {
+    type: String,
+    default: '',
+  },
+  existingAttachmentFileName: {
+    type: String,
+    default: '',
+  },
   isLoading: {
     type: Boolean,
     default: false,
@@ -139,12 +148,25 @@ function handleCancel() {
 
     <!-- File Attachment (Optional) -->
     <div>
+      <div v-if="existingAttachmentUrl && !formData.attachment" class="mb-2 text-sm">
+        <span class="text-lightest-blue">Current attachment:</span>
+        <a
+          :href="existingAttachmentUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="underline text-blue-500 hover:text-blue-400 ml-1"
+        >
+          {{ existingAttachmentFileName || 'View file' }}
+        </a>
+        <span class="text-lightest-blue/70 ml-2">(select a new file to replace)</span>
+      </div>
       <FileUploadField
         v-model="formData.attachment"
         label="Attachment (Optional)"
         helper-text="Add an image, PDF, or other file to include with your time capsule."
         accept="image/*,application/pdf,.doc,.docx"
         :disabled="isLoading"
+        :has-existing-file="!!existingAttachmentUrl"
       />
     </div>
 
