@@ -1,7 +1,16 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
+import { useAuthStore } from '@/stores/auth'
 import ErrorModal from './components/organisms/ErrorModal.vue'
-import HeaderNav from './components/organisms/HeaderNav.vue';
+import HeaderNav from './components/organisms/HeaderNav.vue'
+
+const auth = useAuthStore()
+
+onMounted(() => {
+  auth.init()
+})
 </script>
+
 
 <template>
   <header>
