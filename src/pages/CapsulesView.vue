@@ -16,20 +16,23 @@ const deleteModalOpen = ref(false)
 const capsuleToDelete = ref<number | null>(null)
 
 const capsules = computed(() =>
-  capsuleStore.capsules.map(
-    (c) =>
-      ({
-        id: c.id,
-        title: c.title,
-        preview: c.message,
-        message: c.message,
-        deliveryDate: c.sendAt,
-        visibility: (c as any).visibility || 'PRIVATE',
-        createdAt: c.createdAt,
-        hasAttachment: Boolean((c as any).attachmentUrl || (c as any).fileUrl),
-        userId: c.userId,
-      }) as Capsule,
-  ),
+  capsuleStore.capsules.map((c) => {
+    const visibility = (c as { visibility?: 'PUBLIC' | 'PRIVATE' }).visibility || 'PRIVATE'
+    const attachmentUrl = (c as { attachmentUrl?: string }).attachmentUrl
+    const fileUrl = (c as { fileUrl?: string }).fileUrl
+
+    return {
+      id: c.id,
+      title: c.title,
+      preview: c.message,
+      message: c.message,
+      deliveryDate: c.sendAt,
+      visibility,
+      createdAt: c.createdAt,
+      hasAttachment: Boolean(attachmentUrl || fileUrl),
+      userId: c.userId,
+    } as Capsule
+  }),
 )
 
 onMounted(async () => {
@@ -38,8 +41,8 @@ onMounted(async () => {
   }
 })
 
-function handleSelect(capsule: Capsule) {
-  console.log('Selected capsule:', capsule)
+function handleSelect(id: number) {
+  router.push({ name: 'capsule-details', params: { id } })
 }
 
 function handleEdit(id: number) {
@@ -49,6 +52,10 @@ function handleEdit(id: number) {
 function handleDeleteClick(id: number) {
   capsuleToDelete.value = id
   deleteModalOpen.value = true
+}
+
+function handleCreate() {
+  router.push({ name: 'create-capsule' })
 }
 
 async function confirmDelete() {
@@ -75,12 +82,18 @@ function closeDeleteModal() {
       <div class="max-w-5xl mx-auto">
         <h1 class="text-3xl sm:text-4xl font-extrabold mb-6">Your Time Capsules</h1>
         <TimeCapsuleList
+          v-if="capsules.length > 0"
           :capsules="capsules"
           :currentUserId="Number(authStore.id)"
           @select="handleSelect"
           @edit="handleEdit"
           @delete="handleDeleteClick"
         />
+
+        <div v-else class="mt-10 text-center space-y-4">
+          <p class="text-gray-500">No time capsules found.</p>
+          <Button type="primary" size="md" @click="handleCreate">+ Create Time Capsule</Button>
+        </div>
       </div>
     </main>
 

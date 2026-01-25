@@ -15,17 +15,26 @@ interface Props {
 
 const props = defineProps<Props>()
 const emit = defineEmits<{
+  select: [id: number]
   edit: [id: number]
   delete: [id: number]
 }>()
 
-function handleEdit() {
+function handleSelect() {
+  if (props.id) {
+    emit('select', props.id)
+  }
+}
+
+function handleEdit(event: Event) {
+  event.stopPropagation()
   if (props.id) {
     emit('edit', props.id)
   }
 }
 
-function handleDelete() {
+function handleDelete(event: Event) {
+  event.stopPropagation()
   if (props.id) {
     emit('delete', props.id)
   }
@@ -34,7 +43,8 @@ function handleDelete() {
 
 <template>
   <article
-    class="w-full rounded-xl bg-medium-dark-blue p-4 shadow-md hover:shadow-lg transition-shadow duration-200 border border-dark"
+    class="w-full rounded-xl bg-medium-dark-blue p-4 shadow-md hover:shadow-lg transition-shadow duration-200 border border-dark cursor-pointer"
+    @click="handleSelect"
   >
     <header class="flex justify-between items-start gap-2">
       <h2 class="text-base font-semibold text-lightest-blue">

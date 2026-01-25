@@ -4,34 +4,27 @@ import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
 import { useTimeCapsuleStore } from '@/stores/TimeCapsules'
 import TimeCapsuleCard from '@/components/molecules/TimeCapsuleCard.vue'
-import StatsRow from '@/components/molecules/StatsRow.vue'
-import DashboardOverview from '@/components/organisms/DashboardOverview.vue'
 import Button from '@/components/atoms/Button.vue'
-import type { Capsule } from '@/components/organisms/TimeCapsuleList.vue'
+import api from '@/plugins/axios'
+
 
 const router = useRouter()
 const authStore = useAuthStore()
 const capsuleStore = useTimeCapsuleStore()
 
-const recent = ref([
-  {
-    id: 1,
-    title: 'Graduation Letter',
-    date: '2026-06-15',
-    excerpt: 'A letter to my future self about graduation day.',
-  },
-  { id: 2, title: 'Trip Notes', date: '2025-08-22', excerpt: 'Memories from the Iceland trip.' },
-  {
-    id: 3,
-    title: 'Promise to Future Me',
-    date: '2027-01-01',
-    excerpt: 'New Year resolutions stored for later.',
-  },
-])
+const recentCapsules = ref<Array<{ id: number; title: string; message: string; sendAt: string; createdAt?: string; fileUrl?: string; attachmentUrl?: string }>>([])
 
 const isAuthenticated = computed(() => authStore.isAuthenticated)
 
 onMounted(async () => {
+  // Fetch latest capsules for homepage
+  try {
+    const res = await api.get('/api/home')
+    recentCapsules.value = Array.isArray(res.data) ? res.data : []
+  } catch {
+    recentCapsules.value = []
+  }
+
   if (isAuthenticated.value) {
     await capsuleStore.fetchAllCapsules()
   }
@@ -41,14 +34,6 @@ function handleCreateCapsule() {
   router.push({ name: 'create-capsule' })
 }
 
-function handleViewAll() {
-  router.push({ name: 'capsules' })
-}
-
-function handleSelectCapsule(capsule: Capsule) {
-  console.log('Selected capsule:', capsule)
-  // Could navigate to detail view or edit view
-}
 </script>
 
 <template>
@@ -74,6 +59,30 @@ function handleSelectCapsule(capsule: Capsule) {
           View all your time capsules →
         </router-link>
       </div>
+
+      <div class="mt-12">
+        <div
+          class="bg-white dark:bg-[#071428] border border-gray-100 dark:border-gray-800 rounded-2xl p-6 shadow-lg"
+        >
+          <div class="flex justify-between items-start mb-4">
+            <h3 class="text-lg font-semibold">Recent Time Capsules</h3>
+          </div>
+          <div class="grid gap-4">
+            <TimeCapsuleCard
+              v-for="c in recentCapsules"
+              :key="c.id"
+              :title="c.title"
+              :previewText="c.message"
+              :sendAt="c.sendAt"
+              :createdAt="c.createdAt"
+              :hasAttachment="Boolean(c.attachmentUrl || c.fileUrl)"
+            />
+            <router-link to="/capsules" class="text-sm text-primary hover:underline">
+              View all
+            </router-link>
+          </div>
+        </div>
+      </div>
     </main>
     <!-- Guest View -->
     <main v-else class="max-w-6xl mx-auto px-6 py-12">
@@ -89,7 +98,7 @@ function handleSelectCapsule(capsule: Capsule) {
 
           <div class="mt-6 flex items-center gap-4">
             <router-link
-              to="/create"
+              to="/capsules/create"
               class="inline-block bg-primary text-white px-5 py-3 rounded-lg shadow hover:opacity-95"
               >Create Capsule</router-link
             >
@@ -122,11 +131,13 @@ function handleSelectCapsule(capsule: Capsule) {
             </div>
             <div class="mt-4 grid gap-4">
               <TimeCapsuleCard
-                v-for="c in recent"
+                v-for="c in recentCapsules"
                 :key="c.id"
                 :title="c.title"
-                :date="c.date"
-                :excerpt="c.excerpt"
+                :previewText="c.message"
+                :sendAt="c.sendAt"
+                :createdAt="c.createdAt"
+                :hasAttachment="Boolean(c.attachmentUrl || c.fileUrl)"
               />
               <router-link to="/capsules" class="text-sm text-primary hover:underline"
                 >View all</router-link

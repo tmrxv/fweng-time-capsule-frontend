@@ -19,13 +19,13 @@ defineProps<{
 }>()
 
 const emit = defineEmits<{
-  select: [capsule: Capsule]
+  select: [id: number]
   edit: [id: number]
   delete: [id: number]
 }>()
 
-function handleClick(capsule: Capsule) {
-  emit('select', capsule)
+function handleSelect(id: number) {
+  emit('select', id)
 }
 
 function handleEdit(id: number) {
@@ -47,12 +47,12 @@ function handleDelete(id: number) {
           :id="cap.id"
           :title="cap.title"
           :previewText="cap.preview || cap.message"
-          :deliveryDate="cap.deliveryDate"
+          :sendAt="cap.deliveryDate"
           :visibility="cap.visibility"
           :createdAt="cap.createdAt"
           :hasAttachment="cap.hasAttachment"
           :isOwner="cap.userId === currentUserId"
-          @click="handleClick(cap)"
+          @select="handleSelect"
           @edit="handleEdit"
           @delete="handleDelete"
         />

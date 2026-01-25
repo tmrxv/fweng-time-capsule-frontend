@@ -30,11 +30,11 @@ function isTokenExpired(token: string | null): boolean {
 
 export const useAuthStore = defineStore('authStore', {
   state: () => ({
-    token: sessionStorage.getItem(STORAGE_KEY) as string | null,
+    token: localStorage.getItem(STORAGE_KEY) as string | null,
     isAuthenticated: false,
-    username: sessionStorage.getItem('username') as string | null,
-    role: sessionStorage.getItem('role') as string | null,
-    id: sessionStorage.getItem('id') as string | null,
+    username: localStorage.getItem('username') as string | null,
+    role: localStorage.getItem('role') as string | null,
+    id: localStorage.getItem('id') as string | null,
   }),
 
   actions: {
@@ -46,7 +46,7 @@ export const useAuthStore = defineStore('authStore', {
         const payload = decodeJwt(this.token)
         if (payload?.role) {
           this.role = payload.role
-          sessionStorage.setItem('role', payload.role)
+          localStorage.setItem('role', payload.role)
         }
         if (payload?.exp) {
           scheduleAutoLogout(payload.exp, () => this.logout())
@@ -56,8 +56,13 @@ export const useAuthStore = defineStore('authStore', {
       }
     },
 
-    async login(credentials: { email: string; password: string }) {
-      const res = await api.post('api/auth/login', credentials)
+    async login(credentials: { identifier: string; password: string }) {
+      const isEmail = /[^@\s]+@[^@\s]+\.[^@\s]+/.test(credentials.identifier)
+      const loginPayload = isEmail
+        ? { email: credentials.identifier, password: credentials.password }
+        : { username: credentials.identifier, password: credentials.password }
+
+      const res = await api.post('api/auth/login', loginPayload)
 
       this.token = res.data.token
       this.username = res.data.username
@@ -68,16 +73,16 @@ export const useAuthStore = defineStore('authStore', {
       const incomingId = res.data.id ?? decodeJwt(res.data.token)?.sub ?? null
       this.id = incomingId !== null ? String(incomingId) : null
 
-      sessionStorage.setItem(STORAGE_KEY, res.data.token)
-      if (this.username) sessionStorage.setItem('username', this.username)
-      if (this.id) sessionStorage.setItem('id', String(this.id))
-      if (this.role) sessionStorage.setItem('role', this.role)
+      localStorage.setItem(STORAGE_KEY, res.data.token)
+      if (this.username) localStorage.setItem('username', this.username)
+      if (this.id) localStorage.setItem('id', String(this.id))
+      if (this.role) localStorage.setItem('role', this.role)
 
       axios.defaults.headers.common.Authorization = `Bearer ${res.data.token}`
 
-      const payload = decodeJwt(res.data.token)
-      if (payload?.exp) {
-        scheduleAutoLogout(payload.exp, () => this.logout())
+      const tokenPayload = decodeJwt(res.data.token)
+      if (tokenPayload?.exp) {
+        scheduleAutoLogout(tokenPayload.exp, () => this.logout())
       }
     },
 
@@ -89,7 +94,15 @@ export const useAuthStore = defineStore('authStore', {
       this.id = null
       this.isAuthenticated = false
 
-      sessionStorage.clear()
+      // Remove only our keys from localStorage
+      try {
+        localStorage.removeItem(STORAGE_KEY)
+        localStorage.removeItem('username')
+        localStorage.removeItem('role')
+        localStorage.removeItem('id')
+      } catch {
+        // noop
+      }
       delete axios.defaults.headers.common.Authorization
 
       if (logoutTimer) {

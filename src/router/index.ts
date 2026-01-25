@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../pages/HomeView.vue'
 import { useAuthStore } from '@/stores/auth'
+import CapsuleDetailsView from '@/pages/CapsuleDetailsView.vue'
+import ExploreView from '@/pages/ExploreView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -37,17 +39,17 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/capsules/:id',
+      name: 'capsule-details',
+      component: CapsuleDetailsView,
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/capsules/create',
       name: 'create-capsule',
       component: () => import('../pages/CreateCapsuleView.vue'),
       meta: { requiresAuth: true },
     },
-    /*     {
-      path: '/capsules/:id',
-      name: 'capsule-details',
-      component: () => import('../pages/CapsuleDetailsView.vue'),
-      meta: { requiresAuth: true },
-    }, */
     {
       path: '/capsules/:id/edit',
       name: 'edit-capsule',
@@ -57,7 +59,7 @@ const router = createRouter({
     {
       path: '/explore',
       name: 'explore',
-      component: () => import('../pages/CapsulesView.vue'),
+      component: ExploreView,
     },
     {
       path: '/help',
