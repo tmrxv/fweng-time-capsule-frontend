@@ -16,9 +16,24 @@ export const useTimeCapsuleStore = defineStore('timeCapsuleStore', {
       try {
         const response = await api.get('/api/posts')
         this.capsules = response.data.content
-      } catch (error: any) {
+      } catch (error: unknown) {
         const errorStore = useErrorStore()
-        const message = error.response?.data?.message || 'Failed to fetch time capsules'
+        const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Failed to fetch time capsules'
+        errorStore.triggerError(message)
+        throw error
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async fetchPublicCapsules() {
+      this.loading = true
+      try {
+        const response = await api.get('/api/posts/public')
+        return response.data?.content ?? response.data ?? []
+      } catch (error: unknown) {
+        const errorStore = useErrorStore()
+        const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Failed to fetch public capsules'
         errorStore.triggerError(message)
         throw error
       } finally {
@@ -32,9 +47,9 @@ export const useTimeCapsuleStore = defineStore('timeCapsuleStore', {
         const response = await api.get(`/api/posts/${id}`)
         this.selectedCapsule = response.data
         return response.data
-      } catch (error: any) {
+      } catch (error: unknown) {
         const errorStore = useErrorStore()
-        const message = error.response?.data?.message || 'Failed to fetch time capsule'
+        const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Failed to fetch time capsule'
         errorStore.triggerError(message)
         throw error
       } finally {
@@ -49,9 +64,9 @@ export const useTimeCapsuleStore = defineStore('timeCapsuleStore', {
           params: { userId },
         })
         this.capsules = response.data.content
-      } catch (error: any) {
+      } catch (error: unknown) {
         const errorStore = useErrorStore()
-        const message = error.response?.data?.message || 'Failed to fetch your time capsules'
+        const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Failed to fetch your time capsules'
         errorStore.triggerError(message)
         throw error
       } finally {
@@ -81,19 +96,19 @@ export const useTimeCapsuleStore = defineStore('timeCapsuleStore', {
             if (idx !== -1) this.capsules[idx] = updated
             if (this.selectedCapsule?.id === created.id) this.selectedCapsule = updated
             created = updated
-          } catch (uploadErr: any) {
+          } catch (uploadErr: unknown) {
             const errorStore = useErrorStore()
             const msg =
-              uploadErr?.response?.data?.message || 'Attachment upload failed; capsule created.'
+              (uploadErr as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Attachment upload failed; capsule created.'
             errorStore.triggerError(msg)
             // proceed with created capsule without attachment
           }
         }
 
         return created
-      } catch (error: any) {
+      } catch (error: unknown) {
         const errorStore = useErrorStore()
-        const message = error.response?.data?.message || 'Failed to create time capsule'
+        const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Failed to create time capsule'
         errorStore.triggerError(message)
         throw error
       } finally {
@@ -116,10 +131,10 @@ export const useTimeCapsuleStore = defineStore('timeCapsuleStore', {
             formData.append('file', attachment)
             const uploadRes = await api.post(`/api/posts/${id}/upload`, formData)
             updated = uploadRes.data
-          } catch (uploadErr: any) {
+          } catch (uploadErr: unknown) {
             const errorStore = useErrorStore()
             const msg =
-              uploadErr?.response?.data?.message || 'Attachment upload failed; details saved.'
+              (uploadErr as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Attachment upload failed; details saved.'
             errorStore.triggerError(msg)
             // keep JSON update result
           }
@@ -133,9 +148,9 @@ export const useTimeCapsuleStore = defineStore('timeCapsuleStore', {
           this.selectedCapsule = updated
         }
         return updated
-      } catch (error: any) {
+      } catch (error: unknown) {
         const errorStore = useErrorStore()
-        const message = error.response?.data?.message || 'Failed to update time capsule'
+        const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Failed to update time capsule'
         errorStore.triggerError(message)
         throw error
       } finally {
@@ -151,9 +166,9 @@ export const useTimeCapsuleStore = defineStore('timeCapsuleStore', {
         if (this.selectedCapsule?.id === id) {
           this.selectedCapsule = null
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         const errorStore = useErrorStore()
-        const message = error.response?.data?.message || 'Failed to delete time capsule'
+        const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Failed to delete time capsule'
         errorStore.triggerError(message)
         throw error
       } finally {

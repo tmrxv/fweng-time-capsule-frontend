@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useTimeCapsuleStore } from '@/stores/TimeCapsules'
 import TimeCapsuleForm from '@/components/molecules/TimeCapsuleForm.vue'
-import type { TimeCapsulePostRequest } from '@/types/TimeCapsule'
+import type { TimeCapsulePostRequest, TimeCapsulePostResponse } from '@/types/TimeCapsule'
 
 const router = useRouter()
 const route = useRoute()
@@ -16,30 +16,30 @@ const isLoading = ref(true)
 
 onMounted(async () => {
   try {
-    const capsule = await capsuleStore.fetchCapsuleById(capsuleId)
+    const capsule = (await capsuleStore.fetchCapsuleById(
+      capsuleId,
+    )) as TimeCapsulePostResponse
     initialData.value = {
       title: capsule.title,
       message: capsule.message,
       sendAt: capsule.sendAt,
     }
-    const url = (capsule as any).attachmentUrl || (capsule as any).fileUrl || ''
+    const url = capsule.attachmentUrl ?? capsule.fileUrl ?? ''
     existingAttachmentUrl.value = url
     // Prefer explicit filename if provided; else derive from URL
-    const explicitName = (capsule as any).attachmentFileName || ''
+    const explicitName = capsule.attachmentFileName || ''
     if (explicitName) {
       existingAttachmentFileName.value = explicitName
     } else if (url) {
       try {
         const parsed = new URL(url)
         const lastSeg = parsed.pathname.split('/').filter(Boolean).pop() || ''
-        let decoded = decodeURIComponent(lastSeg)
+        const decoded = decodeURIComponent(lastSeg)
         // Strip UUID prefix (format: uuid-originalname.ext)
         const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}-(.+)$/i
         const match = decoded.match(uuidPattern)
-        if (match) {
-          decoded = match[1]
-        }
-        existingAttachmentFileName.value = decoded
+        const stripped = match?.[1] ?? decoded
+        existingAttachmentFileName.value = stripped
       } catch {
         existingAttachmentFileName.value = 'View file'
       }

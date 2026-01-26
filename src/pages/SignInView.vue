@@ -12,20 +12,28 @@ const router = useRouter()
 const errorStore = useErrorStore()
 const authStore = useAuthStore()
 
-const email = ref('')
+const identifier = ref('')
 const password = ref('')
 const isLoading = ref(false)
 
 const validationSchema = yup.object({
-  email: yup.string().email('Invalid email').required('Email is required'),
+  identifier: yup
+    .string()
+    .required('Username or email is required')
+    .test('is-username-or-email', 'Enter a valid email or username', (value) => {
+      if (!value) return false
+      // Accept any non-empty string as username; if looks like email, ensure valid format
+      const looksLikeEmail = value.includes('@')
+      return looksLikeEmail ? yup.string().email().isValidSync(value) : value.trim().length > 0
+    }),
   password: yup.string().required('Password is required'),
 })
 
 const handleSignIn = async () => {
   isLoading.value = true
   try {
-    await validationSchema.validate({ email: email.value, password: password.value })
-    await authStore.login({ email: email.value, password: password.value })
+    await validationSchema.validate({ identifier: identifier.value, password: password.value })
+    await authStore.login({ identifier: identifier.value, password: password.value })
     router.push({ name: 'home' })
   } catch (err) {
     if (err instanceof yup.ValidationError) {
@@ -64,10 +72,10 @@ const show_notification = ref(true)
 
         <form @submit.prevent="handleSignIn" class="space-y-4">
           <LabeledInput
-            label="Email"
-            type="email"
-            v-model="email"
-            placeholder="Enter your email"
+            label="Username or Email"
+            type="text"
+            v-model="identifier"
+            placeholder="Enter your username or email"
             required
           />
 

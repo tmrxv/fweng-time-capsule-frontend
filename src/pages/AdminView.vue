@@ -19,7 +19,7 @@ interface AdminUser {
   country?: string
   profileImageUrl?: string
   role: string
-  locked?: boolean 
+  locked?: boolean
   createdAt?: string
   updatedAt?: string
 }
@@ -43,7 +43,7 @@ const error = ref<string>('')
 
 const router = useRouter()
 
-// Fulltext search 
+// Fulltext search
 const userSearch = ref('')
 
 // Per-user UI state
@@ -51,7 +51,7 @@ const roleDraft = reactive<Record<number, string>>({})
 const rowExpanded = reactive<Record<number, boolean>>({})
 const actionLoading = reactive<Record<number, boolean>>({})
 
-// Pagination for users 
+// Pagination for users
 const userPage = ref(0)
 const userSize = ref(20)
 const userTotalPages = ref(1)
@@ -82,8 +82,9 @@ async function fetchAdminData() {
     }
 
     posts.value = postsRes.data.content || []
-  } catch (err: any) {
-    error.value = err?.response?.data?.message || 'Failed to load admin data'
+  } catch (err: unknown) {
+    const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
+    error.value = msg || 'Failed to load admin data'
   } finally {
     loading.value = false
   }
@@ -117,9 +118,12 @@ async function updateUserRole(user: AdminUser) {
   try {
     await api.patch(`/api/admin/users/${user.id}`, { role: newRole })
     user.role = newRole
-  } catch (err: any) {
+  } catch (err: unknown) {
     roleDraft[user.id] = user.role
-    error.value = err?.response?.data?.message || 'Failed to update user role'
+    const typedErr = err as { response?: { data?: { message?: string } } ; message?: string }
+    const msg = typedErr.response?.data?.message || typedErr.response?.data || typedErr.message
+    error.value = (typeof msg === 'string' ? msg : undefined) || 'Failed to update user role'
+    console.error('updateUserRole failed', typedErr.response || typedErr)
   } finally {
     actionLoading[user.id] = false
   }
@@ -135,8 +139,11 @@ async function toggleUserLock(user: AdminUser) {
   try {
     await api.patch(`/api/admin/users/${user.id}`, { locked: next })
     user.locked = next
-  } catch (err: any) {
-    error.value = err?.response?.data?.message || 'Failed to lock/unlock user'
+  } catch (err: unknown) {
+    const typedErr = err as { response?: { data?: { message?: string } } ; message?: string }
+    const msg = typedErr.response?.data?.message || typedErr.response?.data || typedErr.message
+    error.value = (typeof msg === 'string' ? msg : undefined) || 'Failed to lock/unlock user'
+    console.error('toggleUserLock failed', typedErr.response || typedErr)
   } finally {
     actionLoading[user.id] = false
   }
@@ -151,8 +158,9 @@ async function deleteUser(user: AdminUser) {
   try {
     await api.delete(`/api/admin/users/${user.id}`)
     users.value = users.value.filter((u) => u.id !== user.id)
-  } catch (err: any) {
-    error.value = err?.response?.data?.message || 'Failed to delete user'
+  } catch (err: unknown) {
+    const typedErr = err as { response?: { data?: { message?: string } } }
+    error.value = typedErr.response?.data?.message || 'Failed to delete user'
   } finally {
     actionLoading[user.id] = false
   }
