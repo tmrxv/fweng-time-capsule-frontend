@@ -10,16 +10,24 @@
 
 /* Base font */
 @layer base {
-  html,
-  body {
+  html {
+    background-color: dark;
+    color-scheme: dark;
     font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  }
+
+  body {
     background-color: dark;
   }
 }
 
-html {
-  background-color: dark;
+/* Optional: Apply transitions only to specific elements that need them */
+[data-theme-transition] {
   transition:
     background-color 0.5s ease,
     color 0.5s ease;
+}
+
+html {
+  background-color: dark;
 }

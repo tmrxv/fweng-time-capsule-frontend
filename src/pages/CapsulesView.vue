@@ -79,7 +79,12 @@ function closeDeleteModal() {
   <div class="min-h-screen bg-surface text-gray-900 dark:text-gray-100 dark:bg-[#061025]">
     <main class="min-h-screen py-12 px-6">
       <div class="max-w-5xl mx-auto">
-        <h1 class="text-3xl sm:text-4xl font-extrabold mb-6">Your Time Capsules</h1>
+        <div class="flex justify-between items-center mb-6 gap-4">
+          <h1 class="text-3xl sm:text-4xl font-extrabold">Your Time Capsules</h1>
+          <Button type="primary" size="md" @click="handleCreate">
+            + Create
+          </Button>
+        </div>
         <TimeCapsuleList
           v-if="capsules.length > 0"
           :capsules="capsules"
