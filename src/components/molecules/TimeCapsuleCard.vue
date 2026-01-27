@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import EditIcon from '@/icons/EditIcon.vue'
 import DeleteIcon from '@/icons/DeleteIcon.vue'
+import { useDateFormat } from '@/composables/UseDateFormat'
+
+const { formatDate, formatDateTime } = useDateFormat()
 
 interface Props {
   id?: number
@@ -89,10 +92,10 @@ function handleDelete(event: Event) {
 
     <div class="mt-3 flex flex-wrap gap-3 text-xs text-lightest-blue/60">
       <span v-if="props.sendAt">
-        📅 Deliver at: <span class="font-mono">{{ props.sendAt }}</span>
+        📅 Deliver at: <span class="font-mono">{{ formatDateTime(props.sendAt) }}</span>
       </span>
       <span v-if="props.createdAt">
-        🕒 Created: <span class="font-mono">{{ props.createdAt }}</span>
+        🕒 Created: <span class="font-mono">{{ formatDateTime(props.createdAt) }}</span>
       </span>
       <span v-if="props.hasAttachment"> 📎 Attachment included </span>
     </div>

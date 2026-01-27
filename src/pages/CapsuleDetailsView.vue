@@ -4,7 +4,9 @@ import { useRoute, useRouter } from 'vue-router'
 import { useTimeCapsuleStore } from '@/stores/TimeCapsules'
 import Button from '@/components/atoms/Button.vue'
 import type { TimeCapsulePostResponse } from '@/types/TimeCapsule'
+import { useDateFormat } from '@/composables/UseDateFormat'
 
+const { formatDate, formatDateTime } = useDateFormat()
 const route = useRoute()
 const router = useRouter()
 const capsuleStore = useTimeCapsuleStore()
@@ -20,7 +22,9 @@ onMounted(async () => {
     const data = await capsuleStore.fetchCapsuleById(capsuleId.value)
     capsule.value = data
   } catch (e: unknown) {
-    error.value = (e as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Failed to load capsule details'
+    error.value =
+      (e as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+      'Failed to load capsule details'
   } finally {
     loading.value = false
   }
@@ -51,14 +55,21 @@ function editCapsule() {
       <div v-else-if="capsule" class="space-y-4 bg-black-100 rounded-xl p-6 border border-white/10">
         <div>
           <h2 class="text-2xl font-bold mb-1">{{ capsule.title }}</h2>
-          <p class="text-sm text-lightest-blue/70">Send at: {{ capsule.sendAt }}</p>
-          <p class="text-sm text-lightest-blue/70">Created: {{ capsule.createdAt }}</p>
-          <p class="text-sm text-lightest-blue/70">Updated: {{ capsule.updatedAt }}</p>
+          <p class="text-sm text-lightest-blue/70">Send at: {{ formatDateTime(capsule.sendAt) }}</p>
+          <p class="text-sm text-lightest-blue/70">
+            Created: {{ formatDateTime(capsule.createdAt) }}
+          </p>
+          <p class="text-sm text-lightest-blue/70">
+            Updated: {{ formatDateTime(capsule.updatedAt) }}
+          </p>
         </div>
 
         <div class="text-base leading-relaxed text-lightest-blue">{{ capsule.message }}</div>
 
-        <div v-if="capsule.attachmentUrl || (capsule as any).fileUrl" class="text-sm text-lightest-blue/80">
+        <div
+          v-if="capsule.attachmentUrl || (capsule as any).fileUrl"
+          class="text-sm text-lightest-blue/80"
+        >
           <span class="font-semibold">Attachment:</span>
           <a
             :href="capsule.attachmentUrl || (capsule as any).fileUrl"
