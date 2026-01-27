@@ -71,11 +71,14 @@ function handleCreateCapsule() {
             <TimeCapsuleCard
               v-for="c in recentCapsules"
               :key="c.id"
+              :id="c.id"
               :title="c.title"
               :previewText="c.message"
               :sendAt="c.sendAt"
               :createdAt="c.createdAt"
+              :visibility="'PUBLIC'"
               :hasAttachment="Boolean(c.attachmentUrl || c.fileUrl)"
+              @select="$router.push({ name: 'capsule-details', params: { id: c.id } })"
             />
             <router-link to="/explore" class="text-sm text-primary hover:underline">
               View all
@@ -133,11 +136,14 @@ function handleCreateCapsule() {
               <TimeCapsuleCard
                 v-for="c in recentCapsules"
                 :key="c.id"
+                :id="c.id"
                 :title="c.title"
                 :previewText="c.message"
                 :sendAt="c.sendAt"
                 :createdAt="c.createdAt"
+                :visibility="'PUBLIC'"
                 :hasAttachment="Boolean(c.attachmentUrl || c.fileUrl)"
+                @select="$router.push({ name: 'capsule-details', params: { id: c.id } })"
               />
               <router-link to="/explore" class="text-sm text-primary hover:underline">
                 >View all</router-link
