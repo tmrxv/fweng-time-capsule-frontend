@@ -29,11 +29,22 @@ export const useTimeCapsuleStore = defineStore('timeCapsuleStore', {
     async fetchPublicCapsules() {
       this.loading = true
       try {
-        const response = await api.get('/api/posts/public')
-        return response.data?.content ?? response.data ?? []
+        console.log('Making API call to /api/posts with visibility=PUBLIC')
+        const response = await api.get('/api/posts', {
+          params: { visibility: 'PUBLIC' },
+        })
+        console.log('API response:', response)
+        console.log('Response data:', response.data)
+
+        const capsules = response.data?.content ?? response.data ?? []
+        console.log('Processed capsules:', capsules)
+        return capsules
       } catch (error: unknown) {
+        console.error('API error:', error)
         const errorStore = useErrorStore()
-        const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Failed to fetch public capsules'
+        const err = error as { response?: { data?: { message?: string }; status?: number }; message?: string }
+        const message = err?.response?.data?.message || err?.message || 'Failed to fetch public capsules'
+        console.error('Error message:', message, 'Status:', err?.response?.status)
         errorStore.triggerError(message)
         throw error
       } finally {

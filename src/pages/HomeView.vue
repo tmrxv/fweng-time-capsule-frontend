@@ -77,7 +77,7 @@ function handleCreateCapsule() {
               :createdAt="c.createdAt"
               :hasAttachment="Boolean(c.attachmentUrl || c.fileUrl)"
             />
-            <router-link to="/capsules" class="text-sm text-primary hover:underline">
+            <router-link to="/explore" class="text-sm text-primary hover:underline">
               View all
             </router-link>
           </div>
@@ -139,7 +139,7 @@ function handleCreateCapsule() {
                 :createdAt="c.createdAt"
                 :hasAttachment="Boolean(c.attachmentUrl || c.fileUrl)"
               />
-              <router-link to="/capsules" class="text-sm text-primary hover:underline"
+              <router-link to="/explore" class="text-sm text-primary hover:underline">
                 >View all</router-link
               >
             </div>
