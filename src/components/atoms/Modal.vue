@@ -25,9 +25,14 @@ function closeModal() {
       class="bg-[#071428] dark:bg-[#061025] rounded-xl shadow-xl p-6 w-full max-w-md border border-gray-800"
       @keydown.esc="closeModal"
       tabindex="0"
+      role="alertdialog"
+      aria-modal="true"
+      :aria-labelledby="title ? 'modal-title' : undefined"
     >
       <div v-if="title" class="mb-4">
-        <h2 class="text-xl font-semibold text-lightest-blue">{{ title }}</h2>
+        <h2 id="modal-title" class="text-xl font-semibold text-lightest-blue">
+          {{ title }}
+        </h2>
       </div>
 
       <div class="text-lightest-blue/80 mb-6">

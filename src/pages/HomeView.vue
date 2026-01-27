@@ -130,7 +130,7 @@ function handleCreateCapsule() {
             class="bg-white dark:bg-[#071428] border border-gray-100 dark:border-gray-800 rounded-2xl p-6 shadow-lg"
           >
             <div class="flex justify-between items-start">
-              <h3 class="text-lg font-semibold">Recent Time Capsules</h3>
+              <h2 class="text-lg font-semibold">Recent Time Capsules</h2>
             </div>
             <div class="mt-4 grid gap-4">
               <TimeCapsuleCard

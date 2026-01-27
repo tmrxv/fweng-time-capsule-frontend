@@ -26,6 +26,7 @@ const radioClasses = computed(
   bg-dark-blue checked:bg-lighter-blue checked:border-lighter-blue
   transition-all duration-200 cursor-pointer
   disabled:opacity-50 disabled:cursor-not-allowed
+  focus:outline-none focus:ring-2 focus:ring-lighter-blue
 `,
 )
 </script>

@@ -8,7 +8,7 @@ interface ButtonStyleProps {
 
 export const useButtonStyles = (props: ButtonStyleProps) => {
   const base =
-    'font-semibold rounded-xl transition-all duration-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg'
+    'font-semibold rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-lighter-blue disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg'
 
   const sizeClasses: ComputedRef<string> = computed(
     () =>

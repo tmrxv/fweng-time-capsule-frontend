@@ -19,14 +19,14 @@ const role = computed(() => authStore.role)
 
       <!-- Navigation links -->
       <nav class="hidden md:flex gap-3 text-white">
-        <router-link to="/" class="hover:underline">Home</router-link>
-        <router-link to="/about" class="hover:underline">About</router-link>
-        <router-link v-if="isAuthenticated" to="/capsules" class="hover:underline"
+        <router-link to="/" class="hover:underline focus:outline-none focus:ring-2 focus:ring-lighter-blue rounded px-1">Home</router-link>
+        <router-link to="/about" class="hover:underline focus:outline-none focus:ring-2 focus:ring-lighter-blue rounded px-1">About</router-link>
+        <router-link v-if="isAuthenticated" to="/capsules" class="hover:underline focus:outline-none focus:ring-2 focus:ring-lighter-blue rounded px-1"
           >My Capsules</router-link
         >
-        <router-link v-else to="/explore" class="hover:underline">Explore</router-link>
-        <router-link to="/help" class="hover:underline">Help</router-link>
-        <router-link to="/imprint" class="hover:underline">Imprint</router-link>
+        <router-link v-else to="/explore" class="hover:underline focus:outline-none focus:ring-2 focus:ring-lighter-blue rounded px-1">Explore</router-link>
+        <router-link to="/help" class="hover:underline focus:outline-none focus:ring-2 focus:ring-lighter-blue rounded px-1">Help</router-link>
+        <router-link to="/imprint" class="hover:underline focus:outline-none focus:ring-2 focus:ring-lighter-blue rounded px-1">Imprint</router-link>
       </nav>
     </div>
 
