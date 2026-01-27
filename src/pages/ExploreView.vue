@@ -17,10 +17,14 @@ const isLoggedIn = computed(() => auth.isAuthenticated)
 
 onMounted(async () => {
   try {
+    console.log('Fetching public capsules...')
     const data = await capsuleStore.fetchPublicCapsules()
+    console.log('Received data:', data)
     publicCapsules.value = data || []
   } catch (e: unknown) {
-    error.value = (e as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Failed to load public capsules'
+    console.error('Error fetching public capsules:', e)
+    const err = e as { response?: { data?: { message?: string }; status?: number }; message?: string }
+    error.value = err?.response?.data?.message || err?.message || 'Failed to load public capsules'
   } finally {
     loading.value = false
   }
