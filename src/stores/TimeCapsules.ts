@@ -29,7 +29,7 @@ export const useTimeCapsuleStore = defineStore('timeCapsuleStore', {
     async fetchPublicCapsules() {
       this.loading = true
       try {
-        console.log('Making API call to /api/posts with visibility=PUBLIC')
+        console.log('Making API call to /api/posts')
         const response = await api.get('/api/posts', {
           params: { visibility: 'PUBLIC' },
         })

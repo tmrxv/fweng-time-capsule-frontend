@@ -1,24 +1,38 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import { useTimeCapsuleStore } from '@/stores/TimeCapsules'
 import TimeCapsuleForm from '@/components/molecules/TimeCapsuleForm.vue'
 import type { TimeCapsulePostRequest, TimeCapsulePostResponse } from '@/types/TimeCapsule'
 
 const router = useRouter()
 const route = useRoute()
+const authStore = useAuthStore()
 const capsuleStore = useTimeCapsuleStore()
 const capsuleId = Number(route.params.id)
 const initialData = ref<Partial<TimeCapsulePostRequest> | null>(null)
 const existingAttachmentUrl = ref<string>('')
 const existingAttachmentFileName = ref<string>('')
 const isLoading = ref(true)
+const error = ref('')
 
 onMounted(async () => {
   try {
     const capsule = (await capsuleStore.fetchCapsuleById(
       capsuleId,
     )) as TimeCapsulePostResponse
+
+    // Check authorization: user must be owner or admin
+    const isOwner = Number(authStore.id) === capsule.userId
+    const isAdmin = authStore.role === 'ADMIN'
+
+    if (!isOwner && !isAdmin) {
+      error.value = 'You do not have permission to edit this capsule'
+      router.push({ name: 'capsules' })
+      return
+    }
+
     initialData.value = {
       title: capsule.title,
       message: capsule.message,
@@ -46,8 +60,8 @@ onMounted(async () => {
     } else {
       existingAttachmentFileName.value = ''
     }
-  } catch (error) {
-    console.error('Failed to load capsule:', error)
+  } catch (err) {
+    console.error('Failed to load capsule:', err)
     router.push({ name: 'capsules' })
   } finally {
     isLoading.value = false
@@ -73,16 +87,41 @@ function handleCancel() {
     class="min-h-screen bg-surface text-gray-900 dark:text-gray-100 dark:bg-[#061025] py-12 px-6"
   >
     <div class="max-w-2xl mx-auto">
-      <h1 class="text-4xl font-extrabold mb-8">Edit Time Capsule</h1>
-      <TimeCapsuleForm
-        v-if="!isLoading && initialData"
-        :initial-data="initialData"
-        :existing-attachment-url="existingAttachmentUrl"
-        :existing-attachment-file-name="existingAttachmentFileName"
-        :is-loading="capsuleStore.loading"
-        @submit="handleSubmit"
-        @cancel="handleCancel"
-      />
+      <!-- Header Section -->
+      <div class="mb-8">
+        <h1 class="text-4xl sm:text-5xl font-extrabold mb-2">Edit Time Capsule</h1>
+        <p class="text-gray-600 dark:text-gray-400">Update your time capsule details</p>
+      </div>
+
+      <!-- Error Message -->
+      <div
+        v-if="error"
+        class="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-300 flex items-start gap-3"
+      >
+        <span class="text-xl">⚠️</span>
+        <span>{{ error }}</span>
+      </div>
+
+      <!-- Loading State -->
+      <div v-if="isLoading" class="flex flex-col items-center justify-center py-12">
+        <div class="animate-spin mb-4">⏳</div>
+        <p class="text-gray-400">Loading capsule...</p>
+      </div>
+
+      <!-- Form Section -->
+      <div
+        v-if="!isLoading && initialData && !error"
+        class="bg-black-100 border border-white/10 rounded-2xl p-8 shadow-xl"
+      >
+        <TimeCapsuleForm
+          :initial-data="initialData"
+          :existing-attachment-url="existingAttachmentUrl"
+          :existing-attachment-file-name="existingAttachmentFileName"
+          :is-loading="capsuleStore.loading"
+          @submit="handleSubmit"
+          @cancel="handleCancel"
+        />
+      </div>
     </div>
   </div>
 </template>

@@ -3,7 +3,7 @@ import EditIcon from '@/icons/EditIcon.vue'
 import DeleteIcon from '@/icons/DeleteIcon.vue'
 import { useDateFormat } from '@/composables/UseDateFormat'
 
-const { formatDate, formatDateTime } = useDateFormat()
+const { formatDateTime } = useDateFormat()
 
 interface Props {
   id?: number
@@ -14,6 +14,7 @@ interface Props {
   createdAt?: string
   hasAttachment?: boolean
   isOwner?: boolean
+  isAdmin?: boolean
 }
 
 const props = defineProps<Props>()
@@ -31,6 +32,9 @@ function handleSelect() {
 
 function handleEdit(event: Event) {
   event.stopPropagation()
+  if (!props.isOwner && !props.isAdmin) {
+    return // Don't allow edit if not owner or admin
+  }
   if (props.id) {
     emit('edit', props.id)
   }
@@ -38,6 +42,9 @@ function handleEdit(event: Event) {
 
 function handleDelete(event: Event) {
   event.stopPropagation()
+  if (!props.isOwner && !props.isAdmin) {
+    return // Don't allow delete if not owner or admin
+  }
   if (props.id) {
     emit('delete', props.id)
   }
@@ -66,8 +73,8 @@ function handleDelete(event: Event) {
           {{ props.visibility === 'PUBLIC' ? 'Public' : 'Private' }}
         </span>
 
-        <!-- Action icons for owner -->
-        <div v-if="props.isOwner" class="flex gap-1">
+        <!-- Action icons for owner or admin -->
+        <div v-if="props.isOwner || props.isAdmin" class="flex gap-1">
           <button
             @click="handleEdit"
             class="p-1.5 rounded text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 transition-colors"

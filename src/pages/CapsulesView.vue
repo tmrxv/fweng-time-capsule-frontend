@@ -17,7 +17,6 @@ const capsuleToDelete = ref<number | null>(null)
 
 const capsules = computed(() =>
   capsuleStore.capsules.map((c) => {
-    const visibility = (c as { visibility?: 'PUBLIC' | 'PRIVATE' }).visibility || 'PRIVATE'
     const attachmentUrl = (c as { attachmentUrl?: string }).attachmentUrl
     const fileUrl = (c as { fileUrl?: string }).fileUrl
 
@@ -27,7 +26,7 @@ const capsules = computed(() =>
       preview: c.message,
       message: c.message,
       deliveryDate: c.sendAt,
-      visibility,
+      visibility: 'PUBLIC' as const,
       createdAt: c.createdAt,
       hasAttachment: Boolean(attachmentUrl || fileUrl),
       userId: c.userId,
@@ -85,6 +84,7 @@ function closeDeleteModal() {
           v-if="capsules.length > 0"
           :capsules="capsules"
           :currentUserId="Number(authStore.id)"
+          :isAdmin="authStore.role === 'ADMIN'"
           @select="handleSelect"
           @edit="handleEdit"
           @delete="handleDeleteClick"

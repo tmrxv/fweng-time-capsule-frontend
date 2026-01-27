@@ -16,6 +16,7 @@ export interface Capsule {
 defineProps<{
   capsules: Capsule[]
   currentUserId?: number
+  isAdmin?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -52,6 +53,7 @@ function handleDelete(id: number) {
           :createdAt="cap.createdAt"
           :hasAttachment="cap.hasAttachment"
           :isOwner="cap.userId === currentUserId"
+          :isAdmin="isAdmin"
           @select="handleSelect"
           @edit="handleEdit"
           @delete="handleDelete"
